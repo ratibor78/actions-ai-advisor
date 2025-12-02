@@ -1,0 +1,34 @@
+name: 'Actions Advisor'
+description: 'AI-powered GitHub Actions failure analysis'
+author: 'ratibor78'
+
+branding:
+  icon: 'alert-circle'
+  color: 'orange'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+
+  api-key:
+    description: 'API key for the LLM provider'
+    required: true
+
+  provider:
+    description: 'LLM provider: openai, anthropic, openrouter, selfhosted'
+    required: false
+    default: 'openrouter'
+
+  model:
+    description: 'Model name (provider-specific)'
+    required: false
+    default: 'gpt-4o-mini'
+
+  base-url:
+    description: 'Custom API URL (only for selfhosted provider)'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
