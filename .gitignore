@@ -55,5 +55,7 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
-# Ai files
+# AI files and local documentation
 PLAN.md
+TEST_REPO_PROMPT.md
+RELEASING.md
