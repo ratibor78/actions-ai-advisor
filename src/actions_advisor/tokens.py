@@ -18,6 +18,15 @@ PRICING: dict[str, dict[str, tuple[float, float]]] = {
         "claude-sonnet-4-latest": (3.00, 15.00),
         "claude-3-opus-latest": (15.00, 75.00),
     },
+    "openrouter": {
+        # OpenRouter pricing (approximate, may vary by tier)
+        "openai/gpt-4o-mini": (0.15, 0.60),
+        "openai/gpt-4o": (2.50, 10.00),
+        "anthropic/claude-3-5-haiku": (0.80, 4.00),
+        "anthropic/claude-3-5-sonnet": (3.00, 15.00),
+        "google/gemini-flash-1.5": (0.075, 0.30),
+        "google/gemini-pro-1.5": (1.25, 5.00),
+    },
 }
 
 

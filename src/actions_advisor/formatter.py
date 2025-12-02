@@ -27,14 +27,13 @@ def format_analysis(
     if estimated_cost is not None:
         cost_str = f"~${estimated_cost:.4f}"
 
-    # Build metadata table
-    metadata_table = f"""| Metric | Value |
-|--------|-------|
-| **Exit Code** | `{job_log.exit_code or "N/A"}` |
-| **Duration** | {duration_str} |
-| **Job** | `{job_log.job_name}` |
-| **Step** | `{job_log.step_name}` |
-| **Conclusion** | `{job_log.conclusion}` |"""
+    # Build metadata table (horizontal for compactness)
+    exit_code = job_log.exit_code or "N/A"
+    metadata_table = (
+        f"| Exit Code | Duration | Job | Step |\n"
+        f"|-----------|----------|-----|------|\n"
+        f"| `{exit_code}` | {duration_str} | `{job_log.job_name}` | `{job_log.step_name}` |"
+    )
 
     # Build token and cost info
     token_info = f"""| **Model** | `{result.model_used}` |
@@ -46,7 +45,7 @@ def format_analysis(
     markdown = f"""# 🔍 Actions Advisor
 
 > [!WARNING]
-> **Workflow Failed:** `{job_log.job_name}` → `{job_log.step_name}`
+> **Failed:** `{job_log.job_name}` → `{job_log.step_name}`
 
 ## 📊 Run Metrics
 
