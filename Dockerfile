@@ -15,5 +15,5 @@ COPY src/ ./src/
 # Install dependencies (production only)
 RUN uv sync --frozen --no-dev || uv sync --no-dev
 
-# Run the action
-ENTRYPOINT ["uv", "run", "actions-advisor"]
+# Run the action using virtual environment Python
+ENTRYPOINT [".venv/bin/python", "-m", "actions_advisor.main"]
