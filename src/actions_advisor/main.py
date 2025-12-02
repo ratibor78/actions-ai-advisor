@@ -21,7 +21,7 @@ async def analyze_failure() -> int:
     """
     try:
         # Load configuration
-        config = Config()
+        config = Config()  # type: ignore[call-arg]
     except ValidationError as e:
         print(f"❌ Configuration error: {e}", file=sys.stderr)
         return 1

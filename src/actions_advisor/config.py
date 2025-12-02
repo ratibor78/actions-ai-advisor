@@ -1,9 +1,9 @@
 """Configuration module for Actions Advisor."""
 
 import os
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -38,9 +38,9 @@ class Config(BaseSettings):
 
     @field_validator("base_url")
     @classmethod
-    def validate_base_url(cls, v: str | None, info: dict) -> str | None:
+    def validate_base_url(cls, v: str | None, info: ValidationInfo) -> str | None:
         """Validate base_url is provided for selfhosted provider."""
-        provider = info.data.get("provider")
+        provider = info.data.get("provider") if info.data else None
         if provider == "selfhosted" and not v:
             raise ValueError("base_url is required when provider is 'selfhosted'")
         return v

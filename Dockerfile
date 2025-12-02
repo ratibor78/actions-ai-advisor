@@ -5,8 +5,8 @@ WORKDIR /app
 # Install uv
 RUN pip install --no-cache-dir uv
 
-# Copy dependency files
-COPY pyproject.toml ./
+# Copy dependency files and README (required by hatchling)
+COPY pyproject.toml README.md ./
 # Copy lock file if it exists
 COPY uv.lock* ./
 
