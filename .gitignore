@@ -54,3 +54,6 @@ dmypy.json
 
 # Ruff
 .ruff_cache/
+
+# Ai files
+PLAN.md
