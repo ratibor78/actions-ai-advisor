@@ -9,12 +9,11 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml README.md ./
 # Copy lock file if it exists
 COPY uv.lock* ./
+# Copy source code (needed before uv sync for package build)
+COPY src/ ./src/
 
 # Install dependencies (production only)
 RUN uv sync --frozen --no-dev || uv sync --no-dev
-
-# Copy source code
-COPY src/ ./src/
 
 # Run the action
 ENTRYPOINT ["uv", "run", "actions-advisor"]

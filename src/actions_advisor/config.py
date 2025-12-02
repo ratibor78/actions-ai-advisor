@@ -1,7 +1,7 @@
 """Configuration module for Actions Advisor."""
 
 import os
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import Field, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
