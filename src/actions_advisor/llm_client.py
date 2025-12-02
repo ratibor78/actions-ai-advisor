@@ -14,13 +14,43 @@ PROVIDER_ENDPOINTS: dict[str, str] = {
 }
 
 # System prompt for analysis
-SYSTEM_PROMPT = """You are an expert CI/CD debugger. Analyze the GitHub Actions failure and provide:
+SYSTEM_PROMPT = """You are an expert CI/CD debugger. Analyze the GitHub Actions failure \
+and provide a well-formatted markdown analysis.
 
-1. **Root Cause** — Clear explanation of why the build failed
-2. **Suggested Fixes** — Actionable steps to resolve the issue
-3. **Error Snippet** — The most relevant error lines
+**Format your response exactly like this:**
 
-Be concise. Use markdown. Focus on actionable advice."""
+## 🎯 Root Cause
+
+[Clear explanation of why the build failed - 2-3 sentences]
+
+## 💡 Suggested Fixes
+
+### 1. [Fix Title]
+[Detailed explanation and steps]
+
+### 2. [Fix Title]
+[Detailed explanation and steps]
+
+### 3. [Fix Title]
+[Detailed explanation and steps]
+
+## 📋 Error Details
+
+<details>
+<summary>Click to expand error trace</summary>
+
+```[language]
+[Most relevant error lines with context]
+```
+
+</details>
+
+**Guidelines:**
+- Use ### subheadings for each fix
+- Be specific and actionable
+- Include code snippets in proper code blocks with language hints
+- Keep error traces in collapsible <details> sections
+- Focus on the most critical errors only"""
 
 # User prompt template
 USER_PROMPT_TEMPLATE = """Analyze this failed GitHub Actions log:

@@ -57,16 +57,31 @@ def test_format_analysis_with_cost():
 
     markdown = format_analysis(job_log, result, estimated_cost=0.0005)
 
+    # Check header and callout
     assert "🔍 Actions Advisor" in markdown
-    assert "Failed: `build` → `Run tests`" in markdown
-    assert "**Exit Code:** 1" in markdown
-    assert "**Duration:** 2m 34s" in markdown
+    assert "Workflow Failed:" in markdown
+    assert "`build` → `Run tests`" in markdown
+
+    # Check metrics table
+    assert "📊 Run Metrics" in markdown
+    assert "| **Exit Code** | `1` |" in markdown
+    assert "| **Duration** | 2m 34s |" in markdown
+    assert "| **Conclusion** | `failure` |" in markdown
+
+    # Check analysis content
     assert "## Root Cause" in markdown
     assert "Test failed" in markdown
     assert "## Suggested Fixes" in markdown
-    assert "📊 1000 input + 500 output tokens" in markdown
-    assert "💰 ~$0.0005" in markdown
-    assert "(gpt-4o-mini)" in markdown
+
+    # Check analysis details table
+    assert "💰 Analysis Details" in markdown
+    assert "| **Model** | `gpt-4o-mini` |" in markdown
+    assert "| **Input Tokens** | 1,000 |" in markdown
+    assert "| **Output Tokens** | 500 |" in markdown
+    assert "| **Est. Cost** | ~$0.0005 |" in markdown
+
+    # Check footer
+    assert "🤖 Powered by Actions Advisor" in markdown
 
 
 def test_format_analysis_without_cost():
@@ -89,12 +104,19 @@ def test_format_analysis_without_cost():
 
     markdown = format_analysis(job_log, result, estimated_cost=None)
 
-    assert "Failed: `lint` → `Check code`" in markdown
-    assert "**Exit Code:** 2" in markdown
-    assert "**Duration:** 45s" in markdown
-    assert "📊 500 input + 250 output tokens" in markdown
-    assert "💰" not in markdown  # No cost
-    assert "(custom-model)" in markdown
+    # Check header
+    assert "Workflow Failed:" in markdown
+    assert "`lint` → `Check code`" in markdown
+
+    # Check metrics table
+    assert "| **Exit Code** | `2` |" in markdown
+    assert "| **Duration** | 45s |" in markdown
+
+    # Check analysis details with N/A cost
+    assert "| **Model** | `custom-model` |" in markdown
+    assert "| **Input Tokens** | 500 |" in markdown
+    assert "| **Output Tokens** | 250 |" in markdown
+    assert "| **Est. Cost** | N/A |" in markdown
 
 
 def test_format_analysis_no_exit_code():
@@ -117,8 +139,9 @@ def test_format_analysis_no_exit_code():
 
     markdown = format_analysis(job_log, result, estimated_cost=0.0001)
 
-    assert "**Exit Code:** N/A" in markdown
-    assert "**Duration:** N/A" in markdown
+    # Check that N/A values are handled correctly in table
+    assert "| **Exit Code** | `N/A` |" in markdown
+    assert "| **Duration** | N/A |" in markdown
 
 
 def test_write_job_summary_to_file(monkeypatch):

@@ -9,7 +9,7 @@ from actions_advisor.log_fetcher import JobLog
 def format_analysis(
     job_log: JobLog, result: AnalysisResult, estimated_cost: float | None
 ) -> str:
-    """Format analysis as markdown.
+    """Format analysis as markdown with modern, visually rich formatting.
 
     Args:
         job_log: Failed job metadata
@@ -17,22 +17,40 @@ def format_analysis(
         estimated_cost: Estimated cost in USD (None if not available)
 
     Returns:
-        Formatted markdown string
+        Formatted markdown string with GitHub callouts, tables, and rich formatting
     """
     # Format duration
     duration_str = _format_duration(job_log.duration_seconds)
 
     # Format cost
-    cost_str = ""
+    cost_str = "N/A"
     if estimated_cost is not None:
-        cost_str = f" | 💰 ~${estimated_cost:.4f}"
+        cost_str = f"~${estimated_cost:.4f}"
 
-    # Build markdown
-    markdown = f"""## 🔍 Actions Advisor
+    # Build metadata table
+    metadata_table = f"""| Metric | Value |
+|--------|-------|
+| **Exit Code** | `{job_log.exit_code or "N/A"}` |
+| **Duration** | {duration_str} |
+| **Job** | `{job_log.job_name}` |
+| **Step** | `{job_log.step_name}` |
+| **Conclusion** | `{job_log.conclusion}` |"""
 
-### ❌ Failed: `{job_log.job_name}` → `{job_log.step_name}`
+    # Build token and cost info
+    token_info = f"""| **Model** | `{result.model_used}` |
+| **Input Tokens** | {result.input_tokens:,} |
+| **Output Tokens** | {result.output_tokens:,} |
+| **Est. Cost** | {cost_str} |"""
 
-**Exit Code:** {job_log.exit_code or "N/A"} | **Duration:** {duration_str}
+    # Build markdown with GitHub callout
+    markdown = f"""# 🔍 Actions Advisor
+
+> [!WARNING]
+> **Workflow Failed:** `{job_log.job_name}` → `{job_log.step_name}`
+
+## 📊 Run Metrics
+
+{metadata_table}
 
 ---
 
@@ -40,8 +58,11 @@ def format_analysis(
 
 ---
 
-<sub>📊 {result.input_tokens} input + {result.output_tokens} output tokens\
-{cost_str} ({result.model_used})</sub>
+## 💰 Analysis Details
+
+{token_info}
+
+<sub>🤖 Powered by Actions Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
 """
 
     return markdown
