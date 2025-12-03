@@ -32,6 +32,8 @@ class AffectedFile:
 FILE_PATTERNS = [
     # Python traceback: File "/path/to/file.py", line 123
     re.compile(r'File "(?P<file>[^"]+\.(?:py|pyx))", line (?P<line>\d+)'),
+    # PHP errors: in /path/to/file.php on line 4
+    re.compile(r" in (?P<file>[^\s]+\.php) on line (?P<line>\d+)"),
     # .NET/C# errors: Program.cs(10,31): error CS0103
     re.compile(r"(?P<file>[\w./\-]+\.cs)\((?P<line>\d+),\d+\):"),
     # Linters/type checkers with quoted files: mypy: "src/types.py"

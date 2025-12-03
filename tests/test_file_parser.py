@@ -277,3 +277,16 @@ def test_normalize_rejects_unknown_absolute_paths():
     # But known CI paths should work
     assert _normalize_file_path("/workspace/src/main.py") == "src/main.py"
     assert _normalize_file_path("/home/circleci/project/test.py") == "test.py"
+
+
+def test_parse_php_error():
+    """Test parsing PHP parse errors."""
+    log = """
+PHP Parse error:  syntax error, unexpected token "{", expecting variable in \
+/home/runner/work/test-actions-advisor/test-actions-advisor/php-app/bad.php on line 4
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find php-app/bad.php with line 4
+    assert any(f.file_path == "php-app/bad.php" and f.line_start == 4 for f in files)
