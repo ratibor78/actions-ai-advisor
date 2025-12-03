@@ -32,12 +32,14 @@ class AffectedFile:
 FILE_PATTERNS = [
     # Python traceback: File "/path/to/file.py", line 123
     re.compile(r'File "(?P<file>[^"]+\.(?:py|pyx))", line (?P<line>\d+)'),
+    # Dockerfile errors: Dockerfile:4
+    re.compile(r"(?P<file>Dockerfile(?:\.[a-z]+)?):(?P<line>\d+)"),
     # Generic: file.py:123 or file.py:123:45
     re.compile(r"(?P<file>[\w./\-]+\.(?:py|js|ts|tsx|jsx|go|rs|rb|java|cpp|c|h)):(?P<line>\d+)(?::\d+)?"),
     # Node.js stack: at /path/to/file.js:123:45
     re.compile(r"at (?P<file>[\w./\-]+\.(?:js|ts|tsx|jsx)):(?P<line>\d+):\d+"),
-    # Docker COPY: COPY file.txt /app/
-    re.compile(r"COPY (?P<file>[\w./\-]+\.\w+)"),
+    # Common extensionless files: Makefile, CMakeLists.txt
+    re.compile(r"(?P<file>(?:Makefile|CMakeLists\.txt|Gemfile|Rakefile)):(?P<line>\d+)"),
     # Webpack: Module not found: Error: Can't resolve './src'
     re.compile(r"Can't resolve ['\"](?P<file>[\w./\-]+)['\"]"),
     # Generic file mention: checking src/main.py
@@ -114,7 +116,19 @@ def _is_valid_file_path(path: str) -> bool:
     if path.startswith(valid_starts):
         return True
 
-    # Or be a simple filename in root
+    # Common extensionless files in root
+    extensionless_files = (
+        "Dockerfile",
+        "Makefile",
+        "Gemfile",
+        "Rakefile",
+        "CMakeLists.txt",
+    )
+    for valid_file in extensionless_files:
+        if path == valid_file or path.startswith(valid_file + "."):
+            return True
+
+    # Or be a simple filename in root with extension
     if "/" not in path and "." in path:
         return True
 

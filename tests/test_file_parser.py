@@ -58,15 +58,22 @@ Error: Cannot find module './src/index.js'
 
 
 def test_parse_docker_copy_error():
-    """Test parsing Docker COPY error."""
+    """Test parsing Docker COPY error shows Dockerfile, not missing file."""
     log = """
-Step 3/5 : COPY app.py /app/
+------
+ > [2/3] COPY app.py /app/:
+------
+Dockerfile:4
+--------------------
+   4 | >>> COPY app.py /app/
+--------------------
 ERROR: failed to build: "/app.py": not found
 """
     files = parse_affected_files(log)
 
+    # Should find Dockerfile:4 (the source), not app.py (the missing file)
     assert len(files) >= 1
-    assert any(f.file_path == "app.py" for f in files)
+    assert any(f.file_path == "Dockerfile" and f.line_start == 4 for f in files)
 
 
 def test_skip_system_paths():
@@ -144,3 +151,21 @@ Module not found: Error: Can't resolve './src' in '/home/runner/work/repo'
 
     assert len(files) >= 1
     assert any("src" in f.file_path for f in files)
+
+
+def test_parse_dockerfile_variants():
+    """Test parsing Dockerfile variants (Dockerfile.dev, Dockerfile.prod)."""
+    log = """
+Dockerfile.dev:12: warning: Using latest tag
+Dockerfile.prod:5: ERROR: invalid syntax
+Dockerfile:10: RUN command failed
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) == 3
+    dockerfile_files = [f for f in files if "Dockerfile" in f.file_path]
+    assert len(dockerfile_files) == 3
+    # Check line numbers are captured
+    assert any(f.line_start == 12 for f in dockerfile_files)
+    assert any(f.line_start == 5 for f in dockerfile_files)
+    assert any(f.line_start == 10 for f in dockerfile_files)
