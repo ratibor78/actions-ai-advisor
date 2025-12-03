@@ -1,0 +1,146 @@
+"""Tests for file parser module."""
+
+from actions_advisor.file_parser import (
+    AffectedFile,
+    format_github_link,
+    parse_affected_files,
+)
+
+
+def test_parse_python_traceback():
+    """Test parsing Python traceback with file and line number."""
+    log = """
+Traceback (most recent call last):
+  File "src/main.py", line 42, in main
+    result = process_data()
+  File "src/processor.py", line 15, in process_data
+    raise ValueError("Invalid data")
+ValueError: Invalid data
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) == 2
+    assert files[0].file_path == "src/main.py"
+    assert files[0].line_start == 42
+    assert files[1].file_path == "src/processor.py"
+    assert files[1].line_start == 15
+
+
+def test_parse_generic_file_line():
+    """Test parsing generic file:line format."""
+    log = """
+src/types.py:1: error: Module shadows stdlib
+tests/test_example.py:3: AssertionError
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) == 2
+    assert files[0].file_path == "src/types.py"
+    assert files[0].line_start == 1
+    assert files[1].file_path == "tests/test_example.py"
+    assert files[1].line_start == 3
+
+
+def test_parse_nodejs_stack_trace():
+    """Test parsing Node.js stack trace."""
+    log = """
+Error: Cannot find module './src/index.js'
+    at Function.Module._resolveFilename (node:internal/modules/cjs/loader.js:933:15)
+    at src/app.js:45:10
+    at lib/server.ts:123:5
+"""
+    files = parse_affected_files(log)
+
+    # Should find src/app.js and lib/server.ts
+    file_paths = [f.file_path for f in files]
+    assert "src/app.js" in file_paths
+    assert "lib/server.ts" in file_paths
+
+
+def test_parse_docker_copy_error():
+    """Test parsing Docker COPY error."""
+    log = """
+Step 3/5 : COPY app.py /app/
+ERROR: failed to build: "/app.py": not found
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    assert any(f.file_path == "app.py" for f in files)
+
+
+def test_skip_system_paths():
+    """Test that system/library paths are filtered out."""
+    log = """
+  File "/usr/lib/python3.12/site-packages/pkg/module.py", line 10
+  File "/opt/hostedtoolcache/Python/3.12/lib/python3.12/asyncio.py", line 50
+  File "src/main.py", line 42
+"""
+    files = parse_affected_files(log)
+
+    # Should only find src/main.py, not system paths
+    assert len(files) == 1
+    assert files[0].file_path == "src/main.py"
+
+
+def test_deduplication():
+    """Test that duplicate file mentions are deduplicated."""
+    log = """
+src/types.py:1: error
+src/types.py:1: note: Module shadows stdlib
+src/main.py:10: error
+src/types.py:1: error
+"""
+    files = parse_affected_files(log)
+
+    # Should have 2 unique files (src/types.py:1 and src/main.py:10)
+    assert len(files) == 2
+
+
+def test_format_github_link_with_line():
+    """Test GitHub link formatting with line number."""
+    file = AffectedFile(file_path="src/main.py", line_start=42)
+
+    link = format_github_link(file, "user", "repo", "abc123")
+
+    assert link == "[`src/main.py:42`](https://github.com/user/repo/blob/abc123/src/main.py#L42)"
+
+
+def test_format_github_link_with_range():
+    """Test GitHub link formatting with line range."""
+    file = AffectedFile(file_path="src/main.py", line_start=10, line_end=15)
+
+    link = format_github_link(file, "user", "repo", "abc123")
+
+    assert (
+        link
+        == "[`src/main.py:10-15`](https://github.com/user/repo/blob/abc123/src/main.py#L10-L15)"
+    )
+
+
+def test_format_github_link_without_line():
+    """Test GitHub link formatting without line number."""
+    file = AffectedFile(file_path="src/main.py")
+
+    link = format_github_link(file, "user", "repo", "abc123")
+
+    assert link == "[`src/main.py`](https://github.com/user/repo/blob/abc123/src/main.py)"
+
+
+def test_parse_empty_log():
+    """Test parsing empty log returns empty list."""
+    files = parse_affected_files("")
+
+    assert files == []
+
+
+def test_parse_webpack_error():
+    """Test parsing webpack module resolution error."""
+    log = """
+ERROR in main
+Module not found: Error: Can't resolve './src' in '/home/runner/work/repo'
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    assert any("src" in f.file_path for f in files)

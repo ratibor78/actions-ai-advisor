@@ -29,6 +29,7 @@ class Config(BaseSettings):
         default_factory=lambda: os.getenv("GITHUB_REPOSITORY", "")
     )
     github_run_id: str = Field(default_factory=lambda: os.getenv("GITHUB_RUN_ID", ""))
+    github_sha: str = Field(default_factory=lambda: os.getenv("GITHUB_SHA", ""))
     github_event_name: str = Field(
         default_factory=lambda: os.getenv("GITHUB_EVENT_NAME", "")
     )

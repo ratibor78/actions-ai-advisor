@@ -2,12 +2,19 @@
 
 import os
 
+from actions_advisor.file_parser import AffectedFile, format_github_link
 from actions_advisor.llm_client import AnalysisResult
 from actions_advisor.log_fetcher import JobLog
 
 
 def format_analysis(
-    job_log: JobLog, result: AnalysisResult, estimated_cost: float | None
+    job_log: JobLog,
+    result: AnalysisResult,
+    estimated_cost: float | None,
+    affected_files: list[AffectedFile] | None = None,
+    repo_owner: str = "",
+    repo_name: str = "",
+    commit_sha: str = "",
 ) -> str:
     """Format analysis as markdown with modern, visually rich formatting.
 
@@ -15,6 +22,10 @@ def format_analysis(
         job_log: Failed job metadata
         result: LLM analysis result
         estimated_cost: Estimated cost in USD (None if not available)
+        affected_files: List of files mentioned in errors (optional)
+        repo_owner: GitHub repository owner for file links
+        repo_name: GitHub repository name for file links
+        commit_sha: Git commit SHA for file links
 
     Returns:
         Formatted markdown string with GitHub callouts, tables, and rich formatting
@@ -41,6 +52,25 @@ def format_analysis(
 | **Output Tokens** | {result.output_tokens:,} |
 | **Est. Cost** | {cost_str} |"""
 
+    # Build affected files section (if available)
+    affected_files_section = ""
+    if affected_files and repo_owner and repo_name and commit_sha:
+        # Limit to top 10 files to keep summary concise
+        files_to_show = affected_files[:10]
+        file_links = [
+            f"- {format_github_link(f, repo_owner, repo_name, commit_sha)}"
+            for f in files_to_show
+        ]
+
+        if file_links:
+            affected_files_section = f"""
+## 📁 Affected Files
+
+{chr(10).join(file_links)}
+
+---
+"""
+
     # Build markdown with GitHub callout
     markdown = f"""# 🔍 Actions Advisor
 
@@ -50,7 +80,7 @@ def format_analysis(
 ## 📊 Run Metrics
 
 {metadata_table}
-
+{affected_files_section}
 ---
 
 {result.analysis}

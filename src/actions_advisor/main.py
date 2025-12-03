@@ -6,6 +6,7 @@ import sys
 from pydantic import ValidationError
 
 from actions_advisor.config import Config
+from actions_advisor.file_parser import parse_affected_files
 from actions_advisor.formatter import format_analysis, write_job_summary
 from actions_advisor.llm_client import LLMClient
 from actions_advisor.log_fetcher import LogFetcher
@@ -64,6 +65,11 @@ async def analyze_failure() -> int:
             preprocessed = preprocess_logs(job_log.raw_logs)
             print(f"  📉 Preprocessed logs: {len(job_log.raw_logs)} → {len(preprocessed)} chars")
 
+            # Parse affected files from logs
+            affected_files = parse_affected_files(job_log.raw_logs)
+            if affected_files:
+                print(f"  📁 Found {len(affected_files)} affected file(s)")
+
             # Count tokens
             token_count = token_counter.count_tokens(preprocessed)
             print(f"  🔢 Estimated input tokens: {token_count}")
@@ -83,7 +89,15 @@ async def analyze_failure() -> int:
                 )
 
                 # Format and write output
-                markdown = format_analysis(job_log, result, estimated_cost)
+                markdown = format_analysis(
+                    job_log,
+                    result,
+                    estimated_cost,
+                    affected_files=affected_files,
+                    repo_owner=config.repo_owner,
+                    repo_name=config.repo_name,
+                    commit_sha=config.github_sha,
+                )
                 write_job_summary(markdown)
 
                 if estimated_cost is not None:
