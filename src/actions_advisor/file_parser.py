@@ -76,6 +76,7 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
 
             # Normalize and validate file path
             normalized_path = _normalize_file_path(file_path)
+
             if normalized_path and _is_valid_file_path(normalized_path):
                 affected_files.add(
                     AffectedFile(
@@ -189,6 +190,10 @@ def format_github_link(
 ) -> str:
     """Generate GitHub URL for file with line number.
 
+    Uses hybrid strategy (universal for all languages):
+    - If path includes directory (e.g., src/main.py) → direct link
+    - If only filename (e.g., main.py) → search link with note
+
     Args:
         file: Affected file with path and line info
         repo_owner: GitHub repository owner
@@ -196,20 +201,30 @@ def format_github_link(
         commit_sha: Git commit SHA
 
     Returns:
-        Markdown formatted link to GitHub file
+        Markdown formatted link to GitHub file or search
     """
-    base_url = f"https://github.com/{repo_owner}/{repo_name}/blob/{commit_sha}/{file.file_path}"
+    # Check if we have a directory path or just a filename
+    has_directory = "/" in file.file_path
 
-    # Add line anchor if available
-    if file.line_start:
-        if file.line_end and file.line_end != file.line_start:
-            # Range: #L10-L15
-            line_anchor = f"#L{file.line_start}-L{file.line_end}"
-            display = f"{file.file_path}:{file.line_start}-{file.line_end}"
+    if has_directory:
+        # Strategy 1: Direct link to file (we have relative path)
+        base_url = f"https://github.com/{repo_owner}/{repo_name}/blob/{commit_sha}/{file.file_path}"
+
+        # Add line anchor if available
+        if file.line_start:
+            if file.line_end and file.line_end != file.line_start:
+                # Range: #L10-L15
+                line_anchor = f"#L{file.line_start}-L{file.line_end}"
+                display = f"{file.file_path}:{file.line_start}-{file.line_end}"
+            else:
+                # Single line: #L10
+                line_anchor = f"#L{file.line_start}"
+                display = f"{file.file_path}:{file.line_start}"
+            return f"[`{display}`]({base_url}{line_anchor})"
         else:
-            # Single line: #L10
-            line_anchor = f"#L{file.line_start}"
-            display = f"{file.file_path}:{file.line_start}"
-        return f"[`{display}`]({base_url}{line_anchor})"
+            return f"[`{file.file_path}`]({base_url})"
     else:
-        return f"[`{file.file_path}`]({base_url})"
+        # Strategy 2: Search link (only filename, path not resolved)
+        search_url = f"https://github.com/{repo_owner}/{repo_name}/search?q=filename:{file.file_path}"
+        display = f"{file.file_path}:{file.line_start}" if file.line_start else file.file_path
+        return f"[`{display}`]({search_url}) _(path not resolved, opened as search)_"

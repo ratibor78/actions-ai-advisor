@@ -214,3 +214,34 @@ Error: /home/runner/work/project/project/dotnet-app/Program.cs(10,31): error CS0
     assert len(files) >= 1
     # Should find Program.cs with line 10
     assert any(f.file_path == "dotnet-app/Program.cs" and f.line_start == 10 for f in files)
+
+
+def test_parse_go_test_with_working_directory():
+    """Test parsing Go test errors creates search link for filename-only paths."""
+    log = """
+Run go test ./...
+--- FAIL: TestAdd (0.00s)
+    math_test.go:7: expected 2, got 3
+FAIL
+FAIL    example.com/go-app    0.002s
+FAIL
+Error: Process completed with exit code 1.
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find math_test.go (filename only) with line 7
+    # Will create search link since no directory in path
+    assert any(f.file_path == "math_test.go" and f.line_start == 7 for f in files)
+
+
+def test_format_github_link_search_for_filename_only():
+    """Test that filename-only paths create search links."""
+    file = AffectedFile(file_path="math_test.go", line_start=7)
+
+    link = format_github_link(file, "user", "repo", "abc123")
+
+    # Should be a search link, not a direct link
+    assert "search?q=filename:math_test.go" in link
+    assert "path not resolved" in link
+    assert "`math_test.go:7`" in link
