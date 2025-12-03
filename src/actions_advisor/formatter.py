@@ -41,7 +41,7 @@ def format_analysis(
     # Build failure header with key metrics (clean format)
     exit_code = job_log.exit_code or "N/A"
     failure_header = (
-        f"**❌ Failed:** `{job_log.job_name}` → `{job_log.step_name}`\n\n"
+        f"**Failed:** `{job_log.job_name}` → `{job_log.step_name}`\n\n"
         f"**Exit Code:** `{exit_code}` | **Duration:** {duration_str}"
     )
 
@@ -65,12 +65,12 @@ def format_analysis(
         if file_links:
             # Clean formatting without extra blank lines
             affected_files_section = (
-                "\n## 📁 Affected Files\n\n"
+                "\n### Affected Files\n\n"
                 f"{chr(10).join(file_links)}\n\n"
             )
 
     # Build markdown output
-    markdown = f"""# 🔍 Actions Advisor
+    markdown = f"""# Actions Advisor
 
 {failure_header}
 {affected_files_section}
@@ -80,11 +80,11 @@ def format_analysis(
 
 ---
 
-## 💰 Analysis Details
+### Analysis Details
 
 {token_info}
 
-<sub>🤖 Powered by Actions Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
+<sub>Powered by Actions Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
 """
 
     return markdown

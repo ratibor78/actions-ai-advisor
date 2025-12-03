@@ -58,8 +58,8 @@ def test_format_analysis_with_cost():
     markdown = format_analysis(job_log, result, estimated_cost=0.0005)
 
     # Check header with metrics (clean format)
-    assert "🔍 Actions Advisor" in markdown
-    assert "**❌ Failed:** `build` → `Run tests`" in markdown
+    assert "# Actions Advisor" in markdown
+    assert "**Failed:** `build` → `Run tests`" in markdown
     assert "**Exit Code:** `1`" in markdown
     assert "**Duration:** 2m 34s" in markdown
 
@@ -69,13 +69,13 @@ def test_format_analysis_with_cost():
     assert "## Suggested Fixes" in markdown
 
     # Check analysis details (single line format)
-    assert "💰 Analysis Details" in markdown
+    assert "### Analysis Details" in markdown
     assert "**Model:** `gpt-4o-mini`" in markdown
     assert "**Tokens:** 1,000 in + 500 out" in markdown
     assert "**Cost:** ~$0.0005" in markdown
 
     # Check footer
-    assert "🤖 Powered by Actions Advisor" in markdown
+    assert "Powered by Actions Advisor" in markdown
 
 
 def test_format_analysis_without_cost():
@@ -99,7 +99,7 @@ def test_format_analysis_without_cost():
     markdown = format_analysis(job_log, result, estimated_cost=None)
 
     # Check header with metrics
-    assert "**❌ Failed:** `lint` → `Check code`" in markdown
+    assert "**Failed:** `lint` → `Check code`" in markdown
     assert "**Exit Code:** `2`" in markdown
     assert "**Duration:** 45s" in markdown
 
@@ -130,7 +130,7 @@ def test_format_analysis_no_exit_code():
     markdown = format_analysis(job_log, result, estimated_cost=0.0001)
 
     # Check that N/A values are handled correctly
-    assert "**❌ Failed:** `deploy` → `Deploy to prod`" in markdown
+    assert "**Failed:** `deploy` → `Deploy to prod`" in markdown
     assert "**Exit Code:** `N/A`" in markdown
     assert "**Duration:** N/A" in markdown
 
