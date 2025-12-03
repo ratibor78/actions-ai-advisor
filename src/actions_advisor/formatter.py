@@ -63,13 +63,11 @@ def format_analysis(
         ]
 
         if file_links:
-            affected_files_section = f"""
-## 📁 Affected Files
-
-{chr(10).join(file_links)}
-
----
-"""
+            # Clean formatting without extra blank lines
+            affected_files_section = (
+                "\n## 📁 Affected Files\n\n"
+                f"{chr(10).join(file_links)}\n\n"
+            )
 
     # Build markdown with GitHub callout
     markdown = f"""# 🔍 Actions Advisor

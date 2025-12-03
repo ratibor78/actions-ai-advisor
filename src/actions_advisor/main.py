@@ -65,10 +65,15 @@ async def analyze_failure() -> int:
             preprocessed = preprocess_logs(job_log.raw_logs)
             print(f"  📉 Preprocessed logs: {len(job_log.raw_logs)} → {len(preprocessed)} chars")
 
-            # Parse affected files from logs
-            affected_files = parse_affected_files(job_log.raw_logs)
-            if affected_files:
-                print(f"  📁 Found {len(affected_files)} affected file(s)")
+            # Parse affected files from logs (gracefully handle failures)
+            affected_files = []
+            try:
+                affected_files = parse_affected_files(job_log.raw_logs)
+                if affected_files:
+                    print(f"  📁 Found {len(affected_files)} affected file(s)")
+            except Exception as e:
+                # Don't fail the entire analysis if file parsing fails
+                print(f"  ⚠️  File parsing failed: {e}", file=sys.stderr)
 
             # Count tokens
             token_count = token_counter.count_tokens(preprocessed)
