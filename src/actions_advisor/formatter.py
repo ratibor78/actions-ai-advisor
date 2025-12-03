@@ -70,7 +70,7 @@ def format_analysis(
             )
 
     # Build markdown output
-    markdown = f"""# Actions Advisor
+    markdown = f"""# Actions AI Advisor
 
 {failure_header}
 {affected_files_section}
@@ -84,7 +84,7 @@ def format_analysis(
 
 {token_info}
 
-<sub>Powered by Actions Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
+<sub>Powered by Actions AI Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
 """
 
     return markdown

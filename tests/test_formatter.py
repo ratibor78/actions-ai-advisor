@@ -58,7 +58,7 @@ def test_format_analysis_with_cost():
     markdown = format_analysis(job_log, result, estimated_cost=0.0005)
 
     # Check header with metrics (clean format)
-    assert "# Actions Advisor" in markdown
+    assert "# Actions AI Advisor" in markdown
     assert "**Failed:** `build` → `Run tests`" in markdown
     assert "**Exit Code:** `1`" in markdown
     assert "**Duration:** 2m 34s" in markdown
@@ -75,7 +75,7 @@ def test_format_analysis_with_cost():
     assert "**Cost:** ~$0.0005" in markdown
 
     # Check footer
-    assert "Powered by Actions Advisor" in markdown
+    assert "Powered by Actions AI Advisor" in markdown
 
 
 def test_format_analysis_without_cost():
