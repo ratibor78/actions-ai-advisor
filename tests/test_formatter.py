@@ -72,12 +72,11 @@ def test_format_analysis_with_cost():
     assert "Test failed" in markdown
     assert "## Suggested Fixes" in markdown
 
-    # Check analysis details table
+    # Check analysis details (single line format)
     assert "💰 Analysis Details" in markdown
-    assert "| **Model** | `gpt-4o-mini` |" in markdown
-    assert "| **Input Tokens** | 1,000 |" in markdown
-    assert "| **Output Tokens** | 500 |" in markdown
-    assert "| **Est. Cost** | ~$0.0005 |" in markdown
+    assert "**Model:** `gpt-4o-mini`" in markdown
+    assert "**Tokens:** 1,000 in + 500 out" in markdown
+    assert "**Cost:** ~$0.0005" in markdown
 
     # Check footer
     assert "🤖 Powered by Actions Advisor" in markdown
@@ -111,11 +110,10 @@ def test_format_analysis_without_cost():
     assert "| Exit Code | Duration | Job | Step |" in markdown
     assert "| `2` | 45s | `lint` | `Check code` |" in markdown
 
-    # Check analysis details with N/A cost
-    assert "| **Model** | `custom-model` |" in markdown
-    assert "| **Input Tokens** | 500 |" in markdown
-    assert "| **Output Tokens** | 250 |" in markdown
-    assert "| **Est. Cost** | N/A |" in markdown
+    # Check analysis details with N/A cost (single line format)
+    assert "**Model:** `custom-model`" in markdown
+    assert "**Tokens:** 500 in + 250 out" in markdown
+    assert "**Cost:** N/A" in markdown
 
 
 def test_format_analysis_no_exit_code():

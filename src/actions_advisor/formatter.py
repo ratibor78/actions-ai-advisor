@@ -46,11 +46,12 @@ def format_analysis(
         f"| `{exit_code}` | {duration_str} | `{job_log.job_name}` | `{job_log.step_name}` |"
     )
 
-    # Build token and cost info
-    token_info = f"""| **Model** | `{result.model_used}` |
-| **Input Tokens** | {result.input_tokens:,} |
-| **Output Tokens** | {result.output_tokens:,} |
-| **Est. Cost** | {cost_str} |"""
+    # Build token and cost info (compact single line)
+    token_info = (
+        f"**Model:** `{result.model_used}` | "
+        f"**Tokens:** {result.input_tokens:,} in + {result.output_tokens:,} out | "
+        f"**Cost:** {cost_str}"
+    )
 
     # Build affected files section (if available)
     affected_files_section = ""
