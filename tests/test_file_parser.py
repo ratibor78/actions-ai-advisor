@@ -218,7 +218,7 @@ Error: /home/runner/work/project/project/dotnet-app/Program.cs(10,31): error CS0
 
 
 def test_parse_go_test_with_working_directory():
-    """Test parsing Go test errors creates search link for filename-only paths."""
+    """Test parsing Go test errors with working directory extraction."""
     log = """
 Run go test ./...
 --- FAIL: TestAdd (0.00s)
@@ -231,9 +231,8 @@ Error: Process completed with exit code 1.
     files = parse_affected_files(log)
 
     assert len(files) >= 1
-    # Should find math_test.go (filename only) with line 7
-    # Will create search link since no directory in path
-    assert any(f.file_path == "math_test.go" and f.line_start == 7 for f in files)
+    # Should find go-app/math_test.go (with go-app prefix from FAIL line)
+    assert any(f.file_path == "go-app/math_test.go" and f.line_start == 7 for f in files)
 
 
 def test_format_github_link_search_for_filename_only():
@@ -290,3 +289,26 @@ PHP Parse error:  syntax error, unexpected token "{", expecting variable in \
     assert len(files) >= 1
     # Should find php-app/bad.php with line 4
     assert any(f.file_path == "php-app/bad.php" and f.line_start == 4 for f in files)
+
+
+def test_parse_rust_test_with_working_directory():
+    """Test parsing Rust test errors with working directory extraction."""
+    log = """
+Compiling rust-app v0.1.0 (/home/runner/work/test-actions-advisor/test-actions-advisor/rust-app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.60s
+     Running unittests src/lib.rs (target/debug/deps/rust_app-cffa5ad734eda335)
+
+running 1 test
+test tests::test_add ... FAILED
+
+failures:
+
+---- tests::test_add stdout ----
+thread 'tests::test_add' panicked at src/lib.rs:11:9:
+assertion `left == right` failed
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find rust-app/src/lib.rs (with rust-app prefix from Compiling line)
+    assert any(f.file_path == "rust-app/src/lib.rs" and f.line_start == 11 for f in files)

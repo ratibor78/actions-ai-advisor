@@ -64,6 +64,9 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
     """
     affected_files: set[AffectedFile] = set()
 
+    # Try to detect working directory from build tool output
+    working_dir = _extract_working_directory(log_content)
+
     for pattern in FILE_PATTERNS:
         for match in pattern.finditer(log_content):
             file_path = match.group("file")
@@ -79,6 +82,10 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
             # Normalize and validate file path
             normalized_path = _normalize_file_path(file_path)
 
+            # If we have a working directory and path looks incomplete, prepend it
+            if working_dir and normalized_path and _looks_like_incomplete_path(normalized_path):
+                normalized_path = f"{working_dir}/{normalized_path}"
+
             if normalized_path and _is_valid_file_path(normalized_path):
                 affected_files.add(
                     AffectedFile(
@@ -89,6 +96,55 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
 
     # Sort by file path for consistent output
     return sorted(affected_files, key=lambda f: (f.file_path, f.line_start or 0))
+
+
+def _extract_working_directory(log_content: str) -> str | None:
+    """Extract working directory from build tool output.
+
+    Looks for patterns like:
+    - Rust: Compiling rust-app v0.1.0 (/path/to/rust-app)
+    - Go: FAIL    example.com/go-app    0.002s
+
+    Args:
+        log_content: Raw log content
+
+    Returns:
+        Working directory name, or None if not found
+    """
+    # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
+    rust_pattern = re.compile(r"Compiling \S+ v[\d.]+ \([^\)]+/(\S+)\)")
+    match = rust_pattern.search(log_content)
+    if match:
+        return match.group(1)
+
+    # Go: FAIL    example.com/go-app    0.002s
+    go_pattern = re.compile(r"^FAIL\s+\S+/(\S+?)\s+[\d.]+s$", re.MULTILINE)
+    match = go_pattern.search(log_content)
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def _looks_like_incomplete_path(path: str) -> bool:
+    """Check if path looks like it might be missing a parent directory.
+
+    Paths like src/lib.rs, tests/test.py, lib/utils.js might be relative
+    to a project subdirectory (e.g., rust-app/src/lib.rs).
+
+    Args:
+        path: Normalized file path
+
+    Returns:
+        True if path might be incomplete
+    """
+    # If it's just a filename (no directory), it might need a working directory prefix
+    if "/" not in path:
+        return True
+
+    # Common generic directory structures that might be in subdirectories
+    generic_starts = ("src/", "tests/", "test/", "lib/", "pkg/", "internal/", "cmd/")
+    return any(path.startswith(prefix) for prefix in generic_starts)
 
 
 def _normalize_file_path(path: str) -> str | None:
