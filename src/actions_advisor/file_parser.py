@@ -32,12 +32,14 @@ class AffectedFile:
 FILE_PATTERNS = [
     # Python traceback: File "/path/to/file.py", line 123
     re.compile(r'File "(?P<file>[^"]+\.(?:py|pyx))", line (?P<line>\d+)'),
+    # .NET/C# errors: Program.cs(10,31): error CS0103
+    re.compile(r"(?P<file>[\w./\-]+\.cs)\((?P<line>\d+),\d+\):"),
     # Linters/type checkers with quoted files: mypy: "src/types.py"
     re.compile(r'(?:mypy|ruff|pylint|flake8|pyright|black):\s+"(?P<file>[^"]+)"'),
     # Dockerfile errors: Dockerfile:4
     re.compile(r"(?P<file>Dockerfile(?:\.[a-z]+)?):(?P<line>\d+)"),
-    # Generic: file.py:123 or file.py:123:45
-    re.compile(r"(?P<file>[\w./\-]+\.(?:py|js|ts|tsx|jsx|go|rs|rb|java|cpp|c|h)):(?P<line>\d+)(?::\d+)?"),
+    # Generic: file.py:123 or file.py:123:45 (expanded to include more extensions)
+    re.compile(r"(?P<file>[\w./\-]+\.(?:py|js|ts|tsx|jsx|go|rs|rb|java|cpp|c|h|cs|php|swift|kt|scala)):(?P<line>\d+)(?::\d+)?"),
     # Node.js stack: at /path/to/file.js:123:45
     re.compile(r"at (?P<file>[\w./\-]+\.(?:js|ts|tsx|jsx)):(?P<line>\d+):\d+"),
     # Common extensionless files: Makefile, CMakeLists.txt
@@ -72,17 +74,51 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
             except (IndexError, ValueError):
                 pass
 
-            # Skip common false positives
-            if _is_valid_file_path(file_path):
+            # Normalize and validate file path
+            normalized_path = _normalize_file_path(file_path)
+            if normalized_path and _is_valid_file_path(normalized_path):
                 affected_files.add(
                     AffectedFile(
-                        file_path=file_path,
+                        file_path=normalized_path,
                         line_start=line_num,
                     )
                 )
 
     # Sort by file path for consistent output
     return sorted(affected_files, key=lambda f: (f.file_path, f.line_start or 0))
+
+
+def _normalize_file_path(path: str) -> str | None:
+    """Normalize file paths to relative project paths.
+
+    Args:
+        path: Raw file path from error logs
+
+    Returns:
+        Normalized relative path, or None if path is invalid
+    """
+    # GitHub Actions workspace: /home/runner/work/{repo}/{repo}/...
+    # Extract relative path after the second occurrence of repo name
+    if "/home/runner/work/" in path:
+        parts = path.split("/")
+        try:
+            work_idx = parts.index("work")
+            # Skip 'work', repo name, repo name again, then take the rest
+            if len(parts) > work_idx + 3:
+                return "/".join(parts[work_idx + 3 :])
+        except (ValueError, IndexError):
+            pass
+
+    # Jenkins/other CI: /workspace/...
+    if path.startswith("/workspace/"):
+        return path.replace("/workspace/", "", 1)
+
+    # CircleCI: /home/circleci/project/...
+    if "/home/circleci/project/" in path:
+        return path.split("/home/circleci/project/", 1)[1]
+
+    # Already relative or simple path
+    return path
 
 
 def _is_valid_file_path(path: str) -> bool:
@@ -133,6 +169,17 @@ def _is_valid_file_path(path: str) -> bool:
     # Or be a simple filename in root with extension
     if "/" not in path and "." in path:
         return True
+
+    # Or have a recognized source code extension (likely project file)
+    if "." in path:
+        ext = path.rsplit(".", 1)[1]
+        source_extensions = {
+            "py", "js", "ts", "tsx", "jsx", "go", "rs", "rb", "java",
+            "cpp", "c", "h", "cs", "php", "swift", "kt", "scala",
+            "pyx", "cc", "hpp", "cxx"
+        }
+        if ext in source_extensions:
+            return True
 
     return False
 

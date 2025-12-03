@@ -195,3 +195,22 @@ Found 3 errors in "tests/test_app.py"
     # Should find at least src/main.py
     file_paths = [f.file_path for f in files]
     assert "src/main.py" in file_paths
+
+
+def test_parse_dotnet_error():
+    """Test parsing .NET/C# error format."""
+    log = """
+Error: /home/runner/work/project/project/dotnet-app/Program.cs(10,31): \
+error CS0103: The name 'UndefinedSymbol' does not exist in the current context
+
+Build FAILED.
+
+Error: /home/runner/work/project/project/dotnet-app/Program.cs(10,31): error CS0103
+    0 Warning(s)
+    1 Error(s)
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find Program.cs with line 10
+    assert any(f.file_path == "dotnet-app/Program.cs" and f.line_start == 10 for f in files)
