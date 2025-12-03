@@ -242,8 +242,9 @@ def test_format_github_link_search_for_filename_only():
 
     link = format_github_link(file, "user", "repo", "abc123")
 
-    # Should be a search link, not a direct link
-    assert "search?q=filename:math_test.go" in link
+    # Should be a search link with path: qualifier (not filename:)
+    assert "search?q=path:math_test.go" in link
+    assert "&type=code" in link
     assert "open as search" in link
     assert "`math_test.go:7`" in link
 

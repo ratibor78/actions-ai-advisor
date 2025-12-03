@@ -237,6 +237,7 @@ def format_github_link(
             return f"[`{file.file_path}`]({base_url})"
     else:
         # Strategy 2: Search link (only filename, path not resolved)
-        search_url = f"https://github.com/{repo_owner}/{repo_name}/search?q=filename:{file.file_path}"
+        # Use path: qualifier (filename: is deprecated) and restrict to code search
+        search_url = f"https://github.com/{repo_owner}/{repo_name}/search?q=path:{file.file_path}&type=code"
         display = f"{file.file_path}:{file.line_start}" if file.line_start else file.file_path
         return f"[`{display}`]({search_url}) _(open as search)_"
