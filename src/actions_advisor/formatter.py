@@ -38,12 +38,13 @@ def format_analysis(
     if estimated_cost is not None:
         cost_str = f"~${estimated_cost:.4f}"
 
-    # Build metadata table (horizontal for compactness)
+    # Build metadata info (compact single line)
     exit_code = job_log.exit_code or "N/A"
-    metadata_table = (
-        f"| Exit Code | Duration | Job | Step |\n"
-        f"|-----------|----------|-----|------|\n"
-        f"| `{exit_code}` | {duration_str} | `{job_log.job_name}` | `{job_log.step_name}` |"
+    metadata_info = (
+        f"**Exit Code:** `{exit_code}` | "
+        f"**Duration:** {duration_str} | "
+        f"**Job:** `{job_log.job_name}` | "
+        f"**Step:** `{job_log.step_name}`"
     )
 
     # Build token and cost info (compact single line)
@@ -78,7 +79,7 @@ def format_analysis(
 
 ## 📊 Run Metrics
 
-{metadata_table}
+{metadata_info}
 {affected_files_section}
 ---
 

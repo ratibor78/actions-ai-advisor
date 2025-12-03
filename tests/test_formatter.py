@@ -62,10 +62,12 @@ def test_format_analysis_with_cost():
     assert "**Failed:**" in markdown
     assert "`build` → `Run tests`" in markdown
 
-    # Check horizontal metrics table
+    # Check run metrics (single line format)
     assert "📊 Run Metrics" in markdown
-    assert "| Exit Code | Duration | Job | Step |" in markdown
-    assert "| `1` | 2m 34s | `build` | `Run tests` |" in markdown
+    assert "**Exit Code:** `1`" in markdown
+    assert "**Duration:** 2m 34s" in markdown
+    assert "**Job:** `build`" in markdown
+    assert "**Step:** `Run tests`" in markdown
 
     # Check analysis content
     assert "## Root Cause" in markdown
@@ -106,9 +108,11 @@ def test_format_analysis_without_cost():
     assert "**Failed:**" in markdown
     assert "`lint` → `Check code`" in markdown
 
-    # Check horizontal metrics table
-    assert "| Exit Code | Duration | Job | Step |" in markdown
-    assert "| `2` | 45s | `lint` | `Check code` |" in markdown
+    # Check run metrics (single line format)
+    assert "**Exit Code:** `2`" in markdown
+    assert "**Duration:** 45s" in markdown
+    assert "**Job:** `lint`" in markdown
+    assert "**Step:** `Check code`" in markdown
 
     # Check analysis details with N/A cost (single line format)
     assert "**Model:** `custom-model`" in markdown
@@ -136,9 +140,11 @@ def test_format_analysis_no_exit_code():
 
     markdown = format_analysis(job_log, result, estimated_cost=0.0001)
 
-    # Check that N/A values are handled correctly in horizontal table
-    assert "| Exit Code | Duration | Job | Step |" in markdown
-    assert "| `N/A` | N/A | `deploy` | `Deploy to prod` |" in markdown
+    # Check that N/A values are handled correctly in single line format
+    assert "**Exit Code:** `N/A`" in markdown
+    assert "**Duration:** N/A" in markdown
+    assert "**Job:** `deploy`" in markdown
+    assert "**Step:** `Deploy to prod`" in markdown
 
 
 def test_write_job_summary_to_file(monkeypatch):
