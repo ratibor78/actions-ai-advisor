@@ -118,6 +118,18 @@ def _normalize_file_path(path: str) -> str | None:
     if "/home/circleci/project/" in path:
         return path.split("/home/circleci/project/", 1)[1]
 
+    # Clean relative path prefixes
+    if path.startswith("./"):
+        path = path[2:]  # Remove ./
+
+    # Parent directory references are not resolvable in repo context
+    if path.startswith("../"):
+        return None
+
+    # Unknown absolute paths (not CI workspace) are likely not resolvable
+    if path.startswith("/"):
+        return None
+
     # Already relative or simple path
     return path
 
@@ -227,4 +239,4 @@ def format_github_link(
         # Strategy 2: Search link (only filename, path not resolved)
         search_url = f"https://github.com/{repo_owner}/{repo_name}/search?q=filename:{file.file_path}"
         display = f"{file.file_path}:{file.line_start}" if file.line_start else file.file_path
-        return f"[`{display}`]({search_url}) _(path not resolved, opened as search)_"
+        return f"[`{display}`]({search_url}) _(open as search)_"

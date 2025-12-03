@@ -142,15 +142,16 @@ def test_parse_empty_log():
 
 
 def test_parse_webpack_error():
-    """Test parsing webpack module resolution error."""
+    """Test parsing webpack module resolution error with file reference."""
     log = """
 ERROR in main
-Module not found: Error: Can't resolve './src' in '/home/runner/work/repo'
+Module not found: Error: Can't resolve './src/utils.js' in '/home/runner/work/repo'
 """
     files = parse_affected_files(log)
 
+    # Should find src/utils.js (after removing ./ prefix)
     assert len(files) >= 1
-    assert any("src" in f.file_path for f in files)
+    assert any(f.file_path == "src/utils.js" for f in files)
 
 
 def test_parse_dockerfile_variants():
@@ -243,5 +244,35 @@ def test_format_github_link_search_for_filename_only():
 
     # Should be a search link, not a direct link
     assert "search?q=filename:math_test.go" in link
-    assert "path not resolved" in link
+    assert "open as search" in link
     assert "`math_test.go:7`" in link
+
+
+def test_normalize_removes_dot_slash():
+    """Test that ./ prefix is removed from paths."""
+    from actions_advisor.file_parser import _normalize_file_path
+
+    assert _normalize_file_path("./src/main.py") == "src/main.py"
+    assert _normalize_file_path("./test.py") == "test.py"
+
+
+def test_normalize_rejects_parent_directory():
+    """Test that ../ paths are rejected."""
+    from actions_advisor.file_parser import _normalize_file_path
+
+    assert _normalize_file_path("../src/main.py") is None
+    assert _normalize_file_path("../../test.py") is None
+
+
+def test_normalize_rejects_unknown_absolute_paths():
+    """Test that unknown absolute paths are rejected."""
+    from actions_advisor.file_parser import _normalize_file_path
+
+    # Unknown CI paths should be rejected
+    assert _normalize_file_path("/builds/project-123/src/main.go") is None
+    assert _normalize_file_path("/tmp/test.py") is None
+    assert _normalize_file_path("/var/app/main.js") is None
+
+    # But known CI paths should work
+    assert _normalize_file_path("/workspace/src/main.py") == "src/main.py"
+    assert _normalize_file_path("/home/circleci/project/test.py") == "test.py"
