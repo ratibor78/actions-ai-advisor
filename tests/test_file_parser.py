@@ -169,3 +169,29 @@ Dockerfile:10: RUN command failed
     assert any(f.line_start == 12 for f in dockerfile_files)
     assert any(f.line_start == 5 for f in dockerfile_files)
     assert any(f.line_start == 10 for f in dockerfile_files)
+
+
+def test_parse_mypy_quoted_file():
+    """Test parsing mypy errors with quoted filenames."""
+    log = """
+mypy: "src/types.py" shadows library module "types"
+note: A user-defined top-level module with name "types" is not supported
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    assert any(f.file_path == "src/types.py" for f in files)
+
+
+def test_parse_ruff_quoted_file():
+    """Test parsing ruff errors with quoted filenames."""
+    log = """
+ruff: "src/main.py" contains errors
+Found 3 errors in "tests/test_app.py"
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find at least src/main.py
+    file_paths = [f.file_path for f in files]
+    assert "src/main.py" in file_paths

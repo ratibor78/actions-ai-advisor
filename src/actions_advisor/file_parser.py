@@ -32,6 +32,8 @@ class AffectedFile:
 FILE_PATTERNS = [
     # Python traceback: File "/path/to/file.py", line 123
     re.compile(r'File "(?P<file>[^"]+\.(?:py|pyx))", line (?P<line>\d+)'),
+    # Linters/type checkers with quoted files: mypy: "src/types.py"
+    re.compile(r'(?:mypy|ruff|pylint|flake8|pyright|black):\s+"(?P<file>[^"]+)"'),
     # Dockerfile errors: Dockerfile:4
     re.compile(r"(?P<file>Dockerfile(?:\.[a-z]+)?):(?P<line>\d+)"),
     # Generic: file.py:123 or file.py:123:45
