@@ -57,10 +57,9 @@ def test_format_analysis_with_cost():
 
     markdown = format_analysis(job_log, result, estimated_cost=0.0005)
 
-    # Check header and callout with metrics
+    # Check header with metrics (clean format)
     assert "🔍 Actions Advisor" in markdown
-    assert "[!WARNING]" in markdown
-    assert "**Failed:** `build` → `Run tests`" in markdown
+    assert "**❌ Failed:** `build` → `Run tests`" in markdown
     assert "**Exit Code:** `1`" in markdown
     assert "**Duration:** 2m 34s" in markdown
 
@@ -99,8 +98,8 @@ def test_format_analysis_without_cost():
 
     markdown = format_analysis(job_log, result, estimated_cost=None)
 
-    # Check callout with metrics
-    assert "**Failed:** `lint` → `Check code`" in markdown
+    # Check header with metrics
+    assert "**❌ Failed:** `lint` → `Check code`" in markdown
     assert "**Exit Code:** `2`" in markdown
     assert "**Duration:** 45s" in markdown
 
@@ -130,8 +129,8 @@ def test_format_analysis_no_exit_code():
 
     markdown = format_analysis(job_log, result, estimated_cost=0.0001)
 
-    # Check that N/A values are handled correctly in callout
-    assert "**Failed:** `deploy` → `Deploy to prod`" in markdown
+    # Check that N/A values are handled correctly
+    assert "**❌ Failed:** `deploy` → `Deploy to prod`" in markdown
     assert "**Exit Code:** `N/A`" in markdown
     assert "**Duration:** N/A" in markdown
 

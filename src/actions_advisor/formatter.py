@@ -38,13 +38,11 @@ def format_analysis(
     if estimated_cost is not None:
         cost_str = f"~${estimated_cost:.4f}"
 
-    # Build callout with key metrics (no duplication)
+    # Build failure header with key metrics (clean format)
     exit_code = job_log.exit_code or "N/A"
-    callout_content = (
-        f"> [!WARNING]\n"
-        f"> **Failed:** `{job_log.job_name}` → `{job_log.step_name}`\n"
-        f">\n"
-        f"> **Exit Code:** `{exit_code}` | **Duration:** {duration_str}"
+    failure_header = (
+        f"**❌ Failed:** `{job_log.job_name}` → `{job_log.step_name}`\n\n"
+        f"**Exit Code:** `{exit_code}` | **Duration:** {duration_str}"
     )
 
     # Build token and cost info (compact single line)
@@ -71,10 +69,10 @@ def format_analysis(
                 f"{chr(10).join(file_links)}\n\n"
             )
 
-    # Build markdown with GitHub callout
+    # Build markdown output
     markdown = f"""# 🔍 Actions Advisor
 
-{callout_content}
+{failure_header}
 {affected_files_section}
 ---
 
