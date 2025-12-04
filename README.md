@@ -377,7 +377,10 @@ Actions AI Advisor uses smart preprocessing to minimize costs:
 ## Output Example
 
 When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary**:
-```markdown
+
+### Example Output Structure
+
+```
 # Actions AI Advisor
 
 **Failed:** `build` → `Run tests`
@@ -386,8 +389,8 @@ When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary**
 
 ### Affected Files
 
-- [`src/calculator.py:42`](https://github.com/owner/repo/blob/.../src/calculator.py#L42)
-- [`tests/test_calculator.py:10`](https://github.com/owner/repo/blob/.../tests/test_calculator.py#L10)
+- `src/calculator.py:42` (clickable link to GitHub)
+- `tests/test_calculator.py:10` (clickable link to GitHub)
 
 ---
 
@@ -399,19 +402,15 @@ addition (`a + b`) instead of multiplication. This is a logic bug.
 ## Suggested Fixes
 
 1. **Change operator in `src/calculator.py:42`:**
-   ```python
    - return a + b
    + return a * b
-   ```
 
 2. **Add more test cases** to catch similar operator errors
 
 ## Error Snippet
 
-```
 FAILED tests/test_calculator.py::test_multiply
   AssertionError: assert 8 == 20
-```
 
 ---
 
@@ -419,8 +418,15 @@ FAILED tests/test_calculator.py::test_multiply
 
 **Model:** `gpt-4o-mini` | **Tokens:** 3,247 in + 423 out | **Cost:** ~$0.0005
 
-<sub>Powered by Actions AI Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
+Powered by Actions AI Advisor | Report Issues
 ```
+
+**Key features:**
+- ✅ Clickable file links with line numbers
+- ✅ AI-generated root cause analysis
+- ✅ Actionable fix suggestions
+- ✅ Relevant error snippets
+- ✅ Token usage and cost transparency
 
 ---
 
