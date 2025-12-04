@@ -244,57 +244,35 @@ jobs:
 
 ## Output Example
 
-When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary**:
+When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary** tab:
 
-### Example Output Structure
-
-```
+```markdown
 # Actions AI Advisor
 
 **Failed:** `build` → `Run tests`
-
 **Exit Code:** `1` | **Duration:** 2m 34s
 
 ### Affected Files
-
-- `src/calculator.py:42` (clickable link to GitHub)
-- `tests/test_calculator.py:10` (clickable link to GitHub)
+- [`src/calculator.py:42`](link) ← Click to jump to line 42
 
 ---
 
 ## Root Cause
+The `multiply()` function uses addition instead of multiplication.
 
-The test `test_multiply` failed because the `multiply()` function uses
-addition (`a + b`) instead of multiplication. This is a logic bug.
-
-## Suggested Fixes
-
-1. **Change operator in `src/calculator.py:42`:**
+## Recommended Actions
+1. Change operator in `src/calculator.py:42`:
+   ```python
    - return a + b
    + return a * b
-
-2. **Add more test cases** to catch similar operator errors
-
-## Error Snippet
-
-FAILED tests/test_calculator.py::test_multiply
-  AssertionError: assert 8 == 20
+   ```
 
 ---
 
-### Analysis Details
-
 **Model:** `gpt-4o-mini` | **Tokens:** 3,247 in + 423 out | **Cost:** ~$0.0005
-
-Powered by Actions AI Advisor | Report Issues
 ```
 
-**Key features:**
-- ✅ Clickable file links with line numbers
-- ✅ AI-generated root cause analysis
-- ✅ Actionable fix suggestions
-- ✅ Relevant error snippets
-- ✅ Token usage and cost transparency
+[See full output format details →](docs/llm-integration.md#5-rich-markdown-output-to-job-summary)
 
 ---
 
@@ -346,87 +324,18 @@ Actions AI Advisor follows semantic versioning with recommended usage patterns:
 
 ## Development
 
-### Local Setup
+**Contributing to Actions AI Advisor?**
 
 ```bash
-# Clone repository
+# Quick start
 git clone https://github.com/ratibor78/actions-advisor.git
 cd actions-advisor
-
-# Install uv (fast Python package manager)
 pip install uv
-
-# Install dependencies
 uv sync
-
-# Run tests (uses mocked APIs, no real API calls)
-uv run pytest
-
-# Run tests with coverage
-uv run pytest --cov=src/actions_advisor --cov-report=term-missing
-
-# Run linting
-uv run ruff check src/ tests/
-
-# Run type checking
-uv run mypy src/
+uv run pytest  # Run tests (all mocked, no API calls)
 ```
 
-### Development Workflow
-
-**For code changes:**
-1. Make changes to source files in `src/actions_advisor/`
-2. Add/update tests in `tests/`
-3. Run `uv run pytest` to verify tests pass
-4. Run `uv run ruff check .` and `uv run mypy src/` before committing
-
-**Tests use mocked APIs** (no real GitHub/LLM API calls, completely free and safe)
-
-### Testing with Real Workflows
-
-To test the action with a real failed workflow run:
-
-```bash
-# 1. Find a failed run ID from your repository
-# Go to: https://github.com/owner/repo/actions
-# Click on a failed run, note the run ID from URL (e.g., 12345678)
-
-# 2. Set environment variables
-export GITHUB_TOKEN="ghp_..."              # Your GitHub PAT
-export INPUT_API_KEY="sk-..."              # Your LLM API key
-export INPUT_PROVIDER="openai"             # or anthropic, openrouter
-export INPUT_MODEL="gpt-4o-mini"
-export GITHUB_REPOSITORY="owner/repo"     # Your repository
-export GITHUB_RUN_ID="12345678"            # Real failed run ID
-export GITHUB_SHA="abc123def456"           # Real commit SHA
-
-# 3. Run action (makes real API calls!)
-uv run actions-advisor
-```
-
-**⚠️ Warning:**
-- Requires a **real failed workflow run** (not a fake ID)
-- Makes **real GitHub API calls** (needs valid token with repo access)
-- Makes **real LLM API calls** (costs money: ~$0.0003-0.0008 per run)
-- Use for manual testing only, not automated testing
-
-### Docker Build
-
-```bash
-# Build image
-docker build -t actions-advisor:test .
-
-# Test with real workflow run (same warnings as above)
-docker run --rm \
-  -e GITHUB_TOKEN="$GITHUB_TOKEN" \
-  -e INPUT_API_KEY="$INPUT_API_KEY" \
-  -e INPUT_PROVIDER="openai" \
-  -e INPUT_MODEL="gpt-4o-mini" \
-  -e GITHUB_REPOSITORY="owner/repo" \
-  -e GITHUB_RUN_ID="12345678" \
-  -e GITHUB_SHA="abc123def456" \
-  actions-advisor:test
-```
+[See comprehensive development guide →](docs/development.md)
 
 ---
 
