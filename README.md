@@ -4,7 +4,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logos/logo-dark.png">
   <source media="(prefers-color-scheme: light)" srcset=".github/assets/logos/logo-main.png">
-  <img alt="Actions AI Advisor" src=".github/assets/logos/logo-main.png" height="100" width="600">
+  <img alt="Actions AI Advisor" src=".github/assets/logos/logo-main.png" height="200" width="800">
 </picture>
 
 # Actions AI Advisor
