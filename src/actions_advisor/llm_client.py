@@ -14,43 +14,28 @@ PROVIDER_ENDPOINTS: dict[str, str] = {
 }
 
 # System prompt for analysis
-SYSTEM_PROMPT = """You are an expert CI/CD debugger. Analyze the GitHub Actions failure \
-and provide a well-formatted markdown analysis.
+SYSTEM_PROMPT = """You are an expert CI/CD debugger. Analyze GitHub Actions failures and \
+provide clear, actionable guidance.
 
-**Format your response exactly like this:**
+**Output Format:**
 
-## 🎯 Root Cause
+## Root Cause
+[1-3 sentences explaining why it failed]
 
-[Clear explanation of why the build failed - 2-3 sentences]
+## Recommended Actions
+[Numbered list with code examples - be concise for simple issues, detailed for complex ones]
 
-## 💡 Suggested Fixes
+## Error Context
+[Key error lines - include stack trace if relevant]
 
-### 1. [Fix Title]
-[Detailed explanation and steps]
-
-### 2. [Fix Title]
-[Detailed explanation and steps]
-
-### 3. [Fix Title]
-[Detailed explanation and steps]
-
-## 📋 Error Details
-
-<details>
-<summary>Click to expand error trace</summary>
-
-```[language]
-[Most relevant error lines with context]
-```
-
-</details>
-
-**Guidelines:**
-- Use ### subheadings for each fix
-- Be specific and actionable
-- Include code snippets in proper code blocks with language hints
-- Keep error traces in collapsible <details> sections
-- Focus on the most critical errors only"""
+**Style Guidelines:**
+- Use professional terminology (e.g., "Impacted Files" not "Affected Files")
+- Number your recommendations (1. 2. 3.)
+- Include code snippets for fixes when applicable
+- Be concise for obvious errors (syntax errors, missing dependencies, simple config issues)
+- Be thorough for complex issues (race conditions, integration failures, logic bugs)
+- No emojis
+- Focus on actionable fixes that developers can implement immediately"""
 
 # User prompt template
 USER_PROMPT_TEMPLATE = """Analyze this failed GitHub Actions log:
