@@ -454,79 +454,6 @@ Actions AI Advisor follows semantic versioning with recommended usage patterns:
 
 ---
 
-## Advanced Usage
-
-### Multiple LLM Providers
-
-Use different models based on failure type:
-
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - run: pytest
-
-  # Fast, cheap analysis for simple failures
-  quick-advisor:
-    if: failure()
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ratibor78/actions-advisor@v1
-        with:
-          github-token: ${{ github.token }}
-          api-key: ${{ secrets.OPENAI_API_KEY }}
-          model: gpt-4o-mini
-
-  # Deep analysis for complex failures (manual trigger)
-  deep-advisor:
-    if: github.event_name == 'workflow_dispatch'
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ratibor78/actions-advisor@v1
-        with:
-          github-token: ${{ github.token }}
-          api-key: ${{ secrets.ANTHROPIC_API_KEY }}
-          provider: anthropic
-          model: claude-3-5-sonnet-latest
-```
-
-### Separate Workflow (Cross-Workflow Triage)
-
-Create a universal advisor that catches failures from **any** workflow:
-
-```yaml
-# .github/workflows/universal-advisor.yml
-name: Universal AI Advisor
-
-on:
-  workflow_run:
-    workflows: ["CI", "Deploy", "Tests"]  # List workflow names
-    types: [completed]
-
-jobs:
-  advisor:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    permissions:
-      actions: read
-    steps:
-      - uses: ratibor78/actions-advisor@v1
-        with:
-          github-token: ${{ github.token }}
-          api-key: ${{ secrets.OPENAI_API_KEY }}
-```
-
-**Trade-offs:**
-- ✅ **Pro:** Works across multiple workflows without modification
-- ✅ **Pro:** Completely isolated from main CI logic
-- ❌ **Con:** ~30 second delay between workflow completion and analysis
-- ❌ **Con:** More complex to debug (two separate workflows)
-
----
-
 ## Troubleshooting
 
 ### Common Issues
@@ -637,88 +564,33 @@ docker run --rm \
 
 ## Contributing
 
-We welcome contributions! Here's how you can help:
+Contributions welcome! **Report bugs** • **Suggest features** • **Improve docs** • **Add tests** • **Submit PRs** • **Star the repo**
 
-**Ways to contribute:**
-- 🐛 Report bugs or issues
-- 💡 Suggest new features or improvements
-- 📝 Improve documentation
-- 🧪 Add tests for new languages
-- 🔧 Submit pull requests
-- ⭐ Star the repository
-
-### Reporting Issues
-
-When reporting bugs, please include:
-- Workflow YAML configuration
-- Error logs (redact secrets!)
-- Expected vs. actual behavior
-- LLM provider and model used
-
-### Feature Requests
-
-For feature requests, please describe:
-- Use case and motivation
-- Expected behavior
-- Alternative solutions considered
+When reporting issues, include: workflow config, error logs (redacted), expected vs actual behavior, and LLM provider/model used.
 
 ---
 
 ## Security
 
-Actions AI Advisor is designed with security in mind:
+**Design:** Read-only (`actions:read` only) • No data retention (memory only) • Secret-aware (GitHub auto-redacts) • API keys in Secrets • Open source
 
-- ✅ **Read-only by default** — Only `actions:read` permission required for GitHub API
-- ✅ **No data retention** — Logs are never stored; only kept in memory during analysis
-- ✅ **Secret-aware** — GitHub automatically redacts secrets in logs before we fetch them
-- ✅ **LLM provider isolation** — API keys stored in GitHub Secrets, used only for authentication
-- ✅ **Open source** — Full transparency, audit the code yourself
+**Sent to LLM:** Preprocessed logs, error messages, job metadata
+**Never sent:** GitHub tokens, API keys, secrets (GitHub replaces with `***` before we fetch)
 
-### Data Privacy
-
-**What gets sent to LLM providers:**
-- ✅ Preprocessed CI logs (ANSI codes removed, timestamps stripped, metadata filtered)
-- ✅ Error messages and stack traces (as they appear in logs)
-- ✅ Job metadata (job name, step name, exit code, duration)
-- ❌ **Never sent:** GitHub tokens, API keys, or other secrets
-  - GitHub's API automatically replaces secrets with `***` before we fetch logs
-  - Our code never implements secret detection—GitHub handles this at the API level
-
-**How it works:**
-1. User adds secrets to GitHub repository (Settings → Secrets and variables)
-2. GitHub Actions masks these in all workflow logs
-3. When we fetch logs via GitHub API, secrets are already redacted
-4. We preprocess and send safe logs to LLM
-
-**Recommendations:**
-- Use separate API keys for CI/CD (not personal keys)
-- Review your LLM provider's data retention policies
-- Consider self-hosted LLMs for highly sensitive codebases
-- Audit logs sent to LLM by checking the action's output in workflow logs
+**Recommendations:** Use separate CI/CD API keys • Review LLM provider policies • Consider self-hosted for sensitive code
 
 ---
 
 ## Roadmap
 
-### Current (v0.1.0-beta)
-- ✅ Multi-language support (10+ languages)
-- ✅ Affected files extraction with clickable links
-- ✅ Smart log preprocessing (70% token reduction)
-- ✅ Multi-provider support (OpenAI, Anthropic, OpenRouter, self-hosted)
-- ✅ Cost estimation and transparency
+**v1.0.0 (Current)**
+- ✅ Multi-language support (10+ languages) • Affected files with clickable links • Smart preprocessing (70% tokens) • Multi-provider (OpenAI, Anthropic, OpenRouter, self-hosted) • Cost transparency
 
-### Planned (v1.0.0)
-- [ ] PR comment mode (optional, in addition to Job Summary)
-- [ ] Caching of analysis results (avoid re-analyzing same errors)
-- [ ] Support for matrix job failures (aggregate analysis)
-- [ ] Custom prompt templates via inputs
-- [ ] More language patterns (Julia, Elixir, Haskell, etc.)
+**v1.1.0 (Next Release)**
+- 🔄 PR comment mode • Analysis caching • Matrix job support • Custom prompts • More languages (Julia, Elixir, Haskell)
 
-### Future Considerations
-- [ ] Web UI for viewing historical analyses
-- [ ] Metrics dashboard (most common errors, cost tracking)
-- [ ] Integration with Slack/Discord for notifications
-- [ ] Support for self-hosted GitHub Enterprise
+**Future**
+- 💭 Web UI • Metrics dashboard • Slack/Discord integration • GitHub Enterprise support
 
 ---
 
