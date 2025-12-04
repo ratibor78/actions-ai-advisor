@@ -247,6 +247,8 @@ jobs:
         with:
           github-token: ${{ github.token }}
           api-key: ${{ secrets.OPENAI_API_KEY }}
+          provider: openai
+          model: gpt-4o-mini
 ```
 
 **How it works:**
@@ -271,7 +273,7 @@ jobs:
     # Optional
     provider: openai              # openai, anthropic, openrouter, selfhosted
     model: gpt-4o-mini            # Provider-specific model name
-    base-url: ""                  # Custom API URL (selfhosted only)
+    base-url: ""                  # Custom API URL (self-hosted only)
 ```
 
 ### LLM Providers
@@ -297,10 +299,6 @@ jobs:
 ```
 **Get key:** [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
-**Available models:**
-- `gpt-4o-mini` — Fast, cheap ($0.15/$0.60 per 1M tokens)
-- `gpt-4o` — More capable for complex logs ($2.50/$10.00 per 1M tokens)
-
 ### Anthropic Claude
 ```yaml
 - uses: ratibor78/actions-advisor@v1
@@ -312,10 +310,6 @@ jobs:
 ```
 **Get key:** [console.anthropic.com](https://console.anthropic.com)
 
-**Available models:**
-- `claude-3-5-haiku-latest` — Fast, economical ($0.80/$4.00 per 1M tokens)
-- `claude-3-5-sonnet-latest` — Advanced reasoning ($3.00/$15.00 per 1M tokens)
-
 ### OpenRouter
 ```yaml
 - uses: ratibor78/actions-advisor@v1
@@ -326,11 +320,6 @@ jobs:
     model: openai/gpt-4o-mini  # or anthropic/claude-3-5-haiku
 ```
 **Get key:** [openrouter.ai/keys](https://openrouter.ai/keys)
-
-**Popular models:**
-- `openai/gpt-4o-mini` — Same as OpenAI direct
-- `anthropic/claude-3-5-haiku` — Same as Anthropic direct
-- `google/gemini-flash-1.5` — Fast, very cheap ($0.075/$0.30 per 1M tokens)
 
 ### Self-Hosted (vLLM, Ollama, etc.)
 ```yaml
