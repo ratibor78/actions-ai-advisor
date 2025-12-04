@@ -278,50 +278,43 @@ jobs:
 
 ### LLM Providers
 
-| Provider | Best For | API Key | Cost per Analysis |
-|----------|----------|---------|-------------------|
-| **openai** | Fast, reliable, cheap | `OPENAI_API_KEY` | ~$0.0003-0.0008 |
-| **anthropic** | Complex logs, large context | `ANTHROPIC_API_KEY` | ~$0.0010-0.0030 |
-| **openrouter** | Multi-model, auto-routing | `OPENROUTER_API_KEY` | ~$0.0003-0.0020 |
-| **selfhosted** | vLLM, Ollama, internal LLMs | Custom | Your infrastructure |
-
-<details>
-<summary><b>Provider Examples (click to expand)</b></summary>
-
-### OpenAI (Recommended)
+**OpenAI (Recommended)**
 ```yaml
 - uses: ratibor78/actions-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENAI_API_KEY }}
     provider: openai
-    model: gpt-4o-mini  # or gpt-4o for complex failures
+    model: gpt-4o-mini  # or gpt-4o
 ```
-**Get key:** [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+[Get API key](https://platform.openai.com/api-keys) • **Cost:** ~$0.0005/analysis • **Best for:** Fast, reliable, cheap
 
-### Anthropic Claude
+<details>
+<summary><b>Other Providers (click to expand)</b></summary>
+
+**Anthropic Claude**
 ```yaml
 - uses: ratibor78/actions-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.ANTHROPIC_API_KEY }}
     provider: anthropic
-    model: claude-3-5-haiku-latest  # or claude-3-5-sonnet-latest
+    model: claude-3-5-haiku-latest
 ```
-**Get key:** [console.anthropic.com](https://console.anthropic.com)
+[Get API key](https://console.anthropic.com) • **Cost:** ~$0.0016/analysis • **Best for:** Complex logs, large context
 
-### OpenRouter
+**OpenRouter**
 ```yaml
 - uses: ratibor78/actions-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENROUTER_API_KEY }}
     provider: openrouter
-    model: openai/gpt-4o-mini  # or anthropic/claude-3-5-haiku
+    model: openai/gpt-4o-mini
 ```
-**Get key:** [openrouter.ai/keys](https://openrouter.ai/keys)
+[Get API key](https://openrouter.ai/keys) • **Cost:** Varies by model • **Best for:** Multi-model routing
 
-### Self-Hosted (vLLM, Ollama, etc.)
+**Self-Hosted**
 ```yaml
 - uses: ratibor78/actions-advisor@v1
   with:
@@ -331,11 +324,7 @@ jobs:
     base-url: https://llm.internal.company.com/v1
     model: Qwen/Qwen2.5-Coder-32B-Instruct
 ```
-
-**Requirements:**
-- OpenAI-compatible API (`/v1/chat/completions` endpoint)
-- Supports JSON mode and structured output
-- Recommended: 7B+ parameter models for code analysis
+**Requirements:** OpenAI-compatible API • 7B+ parameter models recommended
 
 </details>
 
@@ -343,34 +332,15 @@ jobs:
 
 ## Cost & Token Usage
 
-Actions AI Advisor uses smart preprocessing to minimize costs:
+**Typical costs:** ~$0.0003-0.0008 per analysis • **70% token reduction** via preprocessing (ANSI removal, timestamp stripping, metadata filtering)
 
-### Typical Analysis Costs
-
-| Log Size | Raw Tokens | After Preprocessing | Cost (gpt-4o-mini) |
-|----------|------------|---------------------|-------------------|
-| Small (simple error) | 8,000 | ~2,000 | ~$0.0003 |
-| Medium (stack trace) | 15,000 | ~5,000 | ~$0.0008 |
-| Large (complex build) | 30,000 | ~10,000 | ~$0.0015 |
-
-**Preprocessing achieves ~70% token reduction** through:
-- ANSI code removal
-- Timestamp stripping
-- Repeated line collapsing
-- GitHub metadata filtering
-- Failed step extraction
-
-### Model Pricing Comparison
-
-| Provider | Model | Input (per 1M) | Output (per 1M) | Analysis Cost |
-|----------|-------|---------------|----------------|---------------|
-| OpenAI | gpt-4o-mini | $0.15 | $0.60 | ~$0.0005 |
-| OpenAI | gpt-4o | $2.50 | $10.00 | ~$0.0080 |
-| Anthropic | claude-3-5-haiku | $0.80 | $4.00 | ~$0.0016 |
-| Anthropic | claude-3-5-sonnet | $3.00 | $15.00 | ~$0.0090 |
-| OpenRouter | gemini-flash-1.5 | $0.075 | $0.30 | ~$0.0002 |
-
-**Recommendation:** Start with `gpt-4o-mini` for best cost/quality balance.
+| Model | Provider | Cost per Analysis |
+|-------|----------|-------------------|
+| **gpt-4o-mini** ⭐ | OpenAI | ~$0.0005 (recommended) |
+| gpt-4o | OpenAI | ~$0.0080 |
+| claude-3-5-haiku | Anthropic | ~$0.0016 |
+| claude-3-5-sonnet | Anthropic | ~$0.0090 |
+| gemini-flash-1.5 | OpenRouter | ~$0.0002 (cheapest) |
 
 ---
 
