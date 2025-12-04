@@ -126,51 +126,6 @@ Formatted markdown in GitHub Job Summary with:
 
 ---
 
-## Affected Files Feature
-
-One of the most powerful features — automatically extract file paths from error logs with intelligent linking:
-
-### Hybrid Link Strategy
-
-**Direct Links** (when full path known):
-```
-src/main.py:42 → https://github.com/user/repo/blob/SHA/src/main.py#L42
-```
-
-**Search Links** (when only filename available):
-```
-math_test.go:7 → https://github.com/user/repo/search?q=path:math_test.go
-```
-
-### Working Directory Context
-
-**Go Example:**
-```
-FAIL    example.com/go-app    0.002s
-    math_test.go:7: expected 2, got 3
-```
-↓ **Automatically resolves to:** `go-app/math_test.go:7`
-
-**Rust Example:**
-```
-Compiling rust-app v0.1.0 (/path/to/rust-app)
-    thread 'test_add' panicked at src/lib.rs:11:9
-```
-↓ **Automatically resolves to:** `rust-app/src/lib.rs:11`
-
-### Library File Filtering
-
-**Java stack traces** often include JDK internals:
-```
-at com.example.AppTest.testAdd(AppTest.java:9)           ← Shows ✅
-at org.junit.Assert.assertEquals(AssertEquals.java:150)  ← Filters ✗
-at java.base/java.util.ArrayList.get(ArrayList.java:427) ← Filters ✗
-```
-
-**Result:** Only shows `AppTest.java` (your code), not library noise.
-
----
-
 ## <a name="quick-start"></a>Quick Start
 
 ### Basic Setup
