@@ -552,16 +552,30 @@ jobs:
 - **Cause:** Model not in pricing table
 - **Fix:** Self-hosted/unknown models don't have cost estimation
 
-### Debug Mode
+### Viewing Action Logs
 
-Enable debug logs in GitHub Actions:
-```yaml
-- uses: ratibor78/actions-advisor@v1
-  env:
-    ACTIONS_STEP_DEBUG: true
-  with:
-    # ... your config
+The action outputs progress information automatically:
 ```
+🔍 Actions Advisor starting...
+📋 Repository: owner/repo
+🔢 Run ID: 12345
+🤖 Provider: openai (gpt-4o-mini)
+
+📥 Fetching failed job logs...
+Found 1 failed job(s)
+
+[1/1] Analyzing: build → Run tests
+  📉 Preprocessed logs: 45000 → 12000 chars
+  📁 Found 3 affected file(s)
+  🔢 Estimated input tokens: 3247
+  🤖 Sending to LLM for analysis...
+  ✅ Analysis complete (423 output tokens)
+  💰 Estimated cost: $0.0005
+
+✅ Analysis complete!
+```
+
+Check the action's step logs in GitHub Actions UI to see this output.
 
 ---
 
