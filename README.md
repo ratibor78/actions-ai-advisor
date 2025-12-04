@@ -564,8 +564,11 @@ pip install uv
 # Install dependencies
 uv sync
 
-# Run tests
+# Run tests (uses mocked APIs, no real API calls)
 uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=src/actions_advisor --cov-report=term-missing
 
 # Run linting
 uv run ruff check src/ tests/
@@ -574,21 +577,43 @@ uv run ruff check src/ tests/
 uv run mypy src/
 ```
 
-### Testing Locally
+### Development Workflow
+
+**For code changes:**
+1. Make changes to source files in `src/actions_advisor/`
+2. Add/update tests in `tests/`
+3. Run `uv run pytest` to verify tests pass
+4. Run `uv run ruff check .` and `uv run mypy src/` before committing
+
+**Tests use mocked APIs** (no real GitHub/LLM API calls, completely free and safe)
+
+### Testing with Real Workflows
+
+To test the action with a real failed workflow run:
 
 ```bash
-# Set environment variables
-export GITHUB_TOKEN="ghp_..."
-export INPUT_API_KEY="sk-..."
-export INPUT_PROVIDER="openai"
-export INPUT_MODEL="gpt-4o-mini"
-export GITHUB_REPOSITORY="owner/repo"
-export GITHUB_RUN_ID="12345"
-export GITHUB_SHA="abc123"
+# 1. Find a failed run ID from your repository
+# Go to: https://github.com/owner/repo/actions
+# Click on a failed run, note the run ID from URL (e.g., 12345678)
 
-# Run action locally
+# 2. Set environment variables
+export GITHUB_TOKEN="ghp_..."              # Your GitHub PAT
+export INPUT_API_KEY="sk-..."              # Your LLM API key
+export INPUT_PROVIDER="openai"             # or anthropic, openrouter
+export INPUT_MODEL="gpt-4o-mini"
+export GITHUB_REPOSITORY="owner/repo"     # Your repository
+export GITHUB_RUN_ID="12345678"            # Real failed run ID
+export GITHUB_SHA="abc123def456"           # Real commit SHA
+
+# 3. Run action (makes real API calls!)
 uv run actions-advisor
 ```
+
+**⚠️ Warning:**
+- Requires a **real failed workflow run** (not a fake ID)
+- Makes **real GitHub API calls** (needs valid token with repo access)
+- Makes **real LLM API calls** (costs money: ~$0.0003-0.0008 per run)
+- Use for manual testing only, not automated testing
 
 ### Docker Build
 
@@ -596,12 +621,15 @@ uv run actions-advisor
 # Build image
 docker build -t actions-advisor:test .
 
-# Test image
+# Test with real workflow run (same warnings as above)
 docker run --rm \
   -e GITHUB_TOKEN="$GITHUB_TOKEN" \
   -e INPUT_API_KEY="$INPUT_API_KEY" \
+  -e INPUT_PROVIDER="openai" \
+  -e INPUT_MODEL="gpt-4o-mini" \
   -e GITHUB_REPOSITORY="owner/repo" \
-  -e GITHUB_RUN_ID="12345" \
+  -e GITHUB_RUN_ID="12345678" \
+  -e GITHUB_SHA="abc123def456" \
   actions-advisor:test
 ```
 
