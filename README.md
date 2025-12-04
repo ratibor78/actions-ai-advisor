@@ -43,143 +43,29 @@
 
 ## <a name="language-support"></a>Language Support
 
-Automatically detects errors and generates **clickable GitHub links** to exact failure locations across multiple languages:
+Supports **10+ languages** with automatic file path extraction and clickable GitHub links to exact error locations:
 
-### First-Class Support
-Context-aware parsing with intelligent path resolution:
-- **Python** — Traceback parsing, pytest/unittest, linter errors (mypy, ruff, black)
-- **JavaScript/TypeScript** — Stack traces, Jest/Mocha, webpack/Vite build errors
-- **Go** — Test failures with module context, compilation errors
-- **Rust** — Panic messages with Cargo workspace context
-- **Java** — JUnit output, compilation errors (filters JDK/library files)
-- **.NET/C#** — Compiler errors with line/column precision
+**Python** • **JavaScript/TypeScript** • **Go** • **Rust** • **Java** • **.NET/C#** • **PHP** • **Ruby** • **C/C++** • **Docker**
 
-### Supported Languages
-Regex-based error detection:
-- **PHP** — PHPUnit, parse errors
-- **Ruby** — RSpec, Minitest
-- **C/C++** — GCC/Clang compiler errors
-- **Docker** — Dockerfile syntax errors
+**Features:** Context-aware path resolution • Library file filtering • Monorepo support • 70% token reduction
 
-**Example:** `File "src/main.py", line 42` → [`src/main.py:42`](https://github.com/owner/repo/blob/SHA/src/main.py#L42) *(clickable link to line 42)*
-
-**Features:** Monorepo support • Library file filtering • CI path normalization • 70% token reduction
+[See detailed language support →](docs/language-support.md)
 
 ---
 
 ## <a name="how-it-works"></a>How It Works
 
-Actions AI Advisor runs automatically when your workflow fails, fetching logs from GitHub's API, preprocessing them to reduce noise and cost, extracting relevant file paths, and sending everything to your chosen LLM for intelligent analysis. Here's the complete flow:
+Actions AI Advisor automatically analyzes failed workflows in 5 steps:
 
-### 1. Automatic Trigger & Log Collection
+1. **Fetches logs** from GitHub Actions API when a job fails
+2. **Preprocesses** to remove noise and reduce tokens by ~70%
+3. **Extracts file paths** from error messages (10+ languages supported)
+4. **Sends to LLM** for intelligent root cause analysis
+5. **Outputs** formatted markdown to GitHub Job Summary with clickable file links
 
-When a job in your workflow fails (exit code ≠ 0), the advisor job runs via `if: failure()` and connects to GitHub's Actions API to fetch the complete log output from the failed job. This includes stdout, stderr, and all step outputs.
+**End-to-end:** 10-30 seconds • **Cost:** ~$0.0005 per analysis
 
-**What gets collected:**
-- Full job logs with timestamps
-- Step-by-step execution history
-- Error messages and stack traces
-- Exit codes and duration metrics
-
-### 2. Intelligent Log Preprocessing
-
-Raw CI logs are verbose and contain irrelevant noise. The preprocessor applies multiple filters to reduce token count by ~70% while preserving critical error information:
-
-**Preprocessing operations:**
-- **ANSI code removal** — Strips color codes and formatting escape sequences
-- **Timestamp normalization** — Removes redundant ISO 8601 timestamps from each line
-- **Metadata filtering** — Strips GitHub Actions internal commands (`##[group]`, `::set-output`, etc.)
-- **Repeated line collapsing** — Combines duplicate warnings (e.g., "npm WARN deprecated..." × 50 → single instance)
-- **Failed step extraction** — Focuses on the specific steps that failed, not the entire workflow
-- **Context trimming** — Keeps last 150 lines per failed step for relevance
-
-**Result:** A 30,000-character log becomes ~10,000 characters, reducing cost from $0.0015 to $0.0005.
-
-### 3. File Path Extraction & Smart Linking
-
-The action automatically parses error logs to identify files mentioned in errors, supporting 10+ programming languages:
-
-**Detection patterns:**
-- Python: `File "src/main.py", line 42` → Direct link to line 42
-- JavaScript/TypeScript: `at src/app.js:45:10` → Direct link to line 45
-- Go: `math_test.go:7: expected 2, got 3` → Resolves with working directory context
-- Rust: `panicked at src/lib.rs:11:9` → Resolves with Cargo workspace context
-- Java: `AppTest.java:9` → Filters out JDK/JUnit library files
-- .NET: `Program.cs(10,31): error CS0103` → Direct link to line 10
-- PHP, Ruby, C/C++, Docker: Generic patterns with line numbers
-
-**Smart features:**
-- **Path normalization** — Converts CI workspace paths to repository-relative paths
-- **Working directory detection** — Automatically prefixes paths for monorepo structures
-- **Hybrid linking** — Direct links when full path known, search links for filenames only
-- **Library filtering** — Excludes system/library files (Java JDK, Python site-packages)
-
-**Output in Job Summary:**
-```markdown
-### Affected Files
-- [`src/calculator.py:42`](https://github.com/owner/repo/blob/SHA/src/calculator.py#L42) ← Clickable, jumps to line 42
-- [`tests/test_calculator.py:10`](https://github.com/owner/repo/blob/SHA/tests/test_calculator.py#L10)
-```
-
-### 4. LLM Analysis & Root Cause Detection
-
-The preprocessed logs and file context are sent to your configured LLM provider via OpenAI-compatible API:
-
-**Request includes:**
-- Job metadata (name, step, exit code, duration)
-- Preprocessed error logs (cleaned, focused)
-- System prompt optimized for CI/CD debugging
-
-**LLM generates:**
-- **Root Cause** — Clear explanation of why the failure occurred
-- **Suggested Fixes** — Actionable steps to resolve the issue (code changes, config updates)
-- **Error Snippets** — Most relevant error lines highlighted
-- **Context-aware advice** — Understands language-specific idioms (pytest assertions, TypeScript errors, etc.)
-
-**Token usage tracking:**
-- Input tokens counted via tiktoken (OpenAI's tokenizer)
-- Output tokens extracted from API response
-- Cost calculated based on provider pricing ($0.15/$0.60 per 1M tokens for gpt-4o-mini)
-
-### 5. Rich Markdown Output to Job Summary
-
-The final analysis is formatted as GitHub-flavored markdown and written to `$GITHUB_STEP_SUMMARY`, appearing as a dedicated tab in your workflow run:
-
-**Summary includes:**
-```markdown
-# Actions AI Advisor
-
-**Failed:** `build` → `Run tests`
-**Exit Code:** `1` | **Duration:** 2m 34s
-
-### Affected Files
-- [clickable file links with line numbers]
-
----
-
-## Root Cause
-[AI-generated explanation of the failure]
-
-## Suggested Fixes
-1. [Actionable fix with code snippets]
-2. [Alternative approaches]
-
-## Error Snippet
-[Most relevant error lines]
-
----
-
-### Analysis Details
-**Model:** `gpt-4o-mini` | **Tokens:** 3,247 in + 423 out | **Cost:** ~$0.0005
-```
-
-**Key benefits:**
-- ✅ Visible directly in GitHub Actions UI (no external tools)
-- ✅ Persistent (stays with the workflow run forever)
-- ✅ Shareable (link to the run to share the analysis)
-- ✅ Cost-transparent (shows exactly what you paid)
-
-**End-to-end time:** Typically 10-30 seconds from failure to analysis appearing in Job Summary.
+[See detailed architecture →](docs/architecture.md)
 
 ---
 
