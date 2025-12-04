@@ -312,3 +312,25 @@ assertion `left == right` failed
     assert len(files) >= 1
     # Should find rust-app/src/lib.rs (with rust-app prefix from Compiling line)
     assert any(f.file_path == "rust-app/src/lib.rs" and f.line_start == 11 for f in files)
+
+
+def test_parse_java_filters_library_files():
+    """Test that Java library/JDK files are filtered out from stack traces."""
+    log = """
+java.lang.AssertionError: expected:<2> but was:<3>
+    at org.junit.Assert.assertEquals(AssertEquals.java:150)
+    at org.junit.Assert.assertEquals(AssertEquals.java:197)
+    at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+    at java.base/java.util.ArrayList.rangeCheck(ArrayList.java:1511)
+    at com.example.AppTest.testAdd(AppTest.java:9)
+    at java.base/java.lang.Thread.run(Thread.java:833)
+"""
+    files = parse_affected_files(log)
+
+    # Should only find AppTest.java (user code), not library files
+    file_paths = [f.file_path for f in files]
+    assert "AppTest.java" in file_paths
+    assert "AssertEquals.java" not in file_paths
+    assert "Method.java" not in file_paths
+    assert "ArrayList.java" not in file_paths
+    assert "Thread.java" not in file_paths

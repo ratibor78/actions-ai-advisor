@@ -220,6 +220,19 @@ def _is_valid_file_path(path: str) -> bool:
     if len(path) < 3 or len(path) > 200:
         return False
 
+    # Filter out common Java/JDK library files (from stack traces)
+    if path.endswith(".java"):
+        # Common JDK/library class names that should be filtered
+        java_library_files = {
+            "ArrayList.java", "HashMap.java", "Method.java", "Class.java",
+            "String.java", "Integer.java", "Object.java", "Thread.java",
+            "AssertEquals.java", "Assertions.java", "AssertionFailureBuilder.java",
+            "Test.java", "Before.java", "After.java", "Suite.java",
+        }
+        filename = path.split("/")[-1]  # Get just the filename
+        if filename in java_library_files:
+            return False
+
     # Should start with typical project paths or be relative
     valid_starts = ("src/", "tests/", "test/", "lib/", "app/", "./", "../", "pkg/")
     if path.startswith(valid_starts):
