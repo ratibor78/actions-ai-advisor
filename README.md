@@ -388,12 +388,6 @@ Actions AI Advisor uses smart preprocessing to minimize costs:
 ## Output Example
 
 When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary**:
-
-### Example Output
-
-<img src=".github/assets/screenshots/job-summary-example.png" alt="Job Summary Example" width="800">
-
-**Markdown structure:**
 ```markdown
 # Actions AI Advisor
 
