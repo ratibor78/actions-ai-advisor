@@ -43,49 +43,13 @@
 
 ## <a name="language-support"></a>Language Support
 
-Actions AI Advisor analyzes failures across 10+ languages and **automatically generates clickable GitHub links** to exact error locations in your Job Summary.
+Supports **10+ languages** with automatic error detection and **clickable GitHub links** to exact failure locations:
 
-### Supported Languages
+**Python** • **JavaScript/TypeScript** • **Go** • **Rust** • **Java** • **.NET/C#** • **PHP** • **Ruby** • **C/C++** • **Docker**
 
-**First-Class Support** (language-aware parsing with context):
-- **Python** — Traceback parsing, pytest/unittest output, linter errors (mypy, ruff, black)
-- **JavaScript/TypeScript** — Stack traces, Jest/Mocha output, webpack/Vite errors
-- **Go** — Test failures with module context, compilation errors
-- **Rust** — Panic messages with Cargo workspace context, compiler errors
-- **Java** — JUnit output, compilation errors, stack traces (automatically filters JDK/library files)
-- **.NET/C#** — Compiler errors with line/column, xUnit/NUnit output
+**Example:** Error log says `File "src/main.py", line 42` → Job Summary shows [`src/main.py:42`](https://github.com/owner/repo/blob/SHA/src/main.py#L42) *(click to jump to line 42)*
 
-**Supported** (regex-based extraction):
-- **PHP** — PHPUnit, parse errors
-- **Ruby** — RSpec, Minitest
-- **C/C++** — GCC/Clang errors
-- **Docker** — Dockerfile syntax errors
-
-### How Path Detection Works
-
-Different languages and tools report file paths in different formats. Actions AI Advisor normalizes them into **clickable GitHub links**:
-
-| Raw Error in Logs | What We Extract | Result in Job Summary |
-|-------------------|----------------|----------------------|
-| `File "src/main.py", line 42` (Python) | File path + line number | [`src/main.py:42`](https://github.com/owner/repo/blob/SHA/src/main.py#L42) |
-| `at src/app.js:45:10` (JavaScript) | File path + line number | [`src/app.js:45`](https://github.com/owner/repo/blob/SHA/src/app.js#L45) |
-| `math_test.go:7: assertion failed` (Go) | Filename + working dir context | [`pkg/math/math_test.go:7`](https://github.com/owner/repo/blob/SHA/pkg/math/math_test.go#L7) |
-| `panicked at src/lib.rs:11:9` (Rust) | File path + crate context | [`my-crate/src/lib.rs:11`](https://github.com/owner/repo/blob/SHA/my-crate/src/lib.rs#L11) |
-| `AppTest.java:15` (Java) | File path (library files filtered) | [`src/test/java/AppTest.java:15`](https://github.com/owner/repo/blob/SHA/src/test/java/AppTest.java#L15) |
-| `Program.cs(10,31): error CS0103` (.NET) | File path + line number | [`Program.cs:10`](https://github.com/owner/repo/blob/SHA/Program.cs#L10) |
-
-**Smart Features:**
-- ✅ **Context-aware** — Uses build tool output (Cargo workspace, Go module paths) to resolve relative paths
-- ✅ **Library filtering** — Excludes irrelevant files (Java JDK classes, Python site-packages)
-- ✅ **Hybrid linking** — Direct line links when possible, search links for filename-only errors
-- ✅ **Path normalization** — Converts CI workspace absolute paths to repository-relative paths
-
-**Example Output:**
-```markdown
-### Affected Files
-- [`src/calculator.py:42`](https://github.com/your-org/your-repo/blob/abc123/src/calculator.py#L42) ← Click to jump to line 42
-- [`tests/test_calculator.py:10`](https://github.com/your-org/your-repo/blob/abc123/tests/test_calculator.py#L10)
-```
+**Smart detection:** Context-aware path resolution • Library file filtering • Monorepo support • 70% token reduction via preprocessing
 
 ---
 
