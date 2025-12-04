@@ -43,13 +43,27 @@
 
 ## <a name="language-support"></a>Language Support
 
-Supports **10+ languages** with automatic error detection and **clickable GitHub links** to exact failure locations:
+Automatically detects errors and generates **clickable GitHub links** to exact failure locations across multiple languages:
 
-**Python** • **JavaScript/TypeScript** • **Go** • **Rust** • **Java** • **.NET/C#** • **PHP** • **Ruby** • **C/C++** • **Docker**
+### First-Class Support
+Context-aware parsing with intelligent path resolution:
+- **Python** — Traceback parsing, pytest/unittest, linter errors (mypy, ruff, black)
+- **JavaScript/TypeScript** — Stack traces, Jest/Mocha, webpack/Vite build errors
+- **Go** — Test failures with module context, compilation errors
+- **Rust** — Panic messages with Cargo workspace context
+- **Java** — JUnit output, compilation errors (filters JDK/library files)
+- **.NET/C#** — Compiler errors with line/column precision
 
-**Example:** Error log says `File "src/main.py", line 42` → Job Summary shows [`src/main.py:42`](https://github.com/owner/repo/blob/SHA/src/main.py#L42) *(click to jump to line 42)*
+### Supported Languages
+Regex-based error detection:
+- **PHP** — PHPUnit, parse errors
+- **Ruby** — RSpec, Minitest
+- **C/C++** — GCC/Clang compiler errors
+- **Docker** — Dockerfile syntax errors
 
-**Smart detection:** Context-aware path resolution • Library file filtering • Monorepo support • 70% token reduction via preprocessing
+**Example:** `File "src/main.py", line 42` → [`src/main.py:42`](https://github.com/owner/repo/blob/SHA/src/main.py#L42) *(clickable link to line 42)*
+
+**Features:** Monorepo support • Library file filtering • CI path normalization • 70% token reduction
 
 ---
 
