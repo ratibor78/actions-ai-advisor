@@ -7,8 +7,6 @@
   <img alt="Actions AI Advisor" src=".github/assets/logos/logo-main.png" height="300" width="900">
 </picture>
 
-# Actions AI Advisor
-
 **Stop digging through CI logs manually. Let AI explain failures for you.**
 
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Actions%20AI%20Advisor-blue?style=flat-square&logo=github)](https://github.com/marketplace/actions/actions-ai-advisor)
