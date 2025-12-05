@@ -246,7 +246,7 @@ jobs:
 
 When a workflow fails, Actions AI Advisor writes analysis to the **Job Summary** tab:
 
-```markdown
+```
 # Actions AI Advisor
 
 **Failed:** `build` → `Run tests`
@@ -262,10 +262,8 @@ The `multiply()` function uses addition instead of multiplication.
 
 ## Recommended Actions
 1. Change operator in `src/calculator.py:42`:
-   ```python
    - return a + b
    + return a * b
-   ```
 
 ---
 
