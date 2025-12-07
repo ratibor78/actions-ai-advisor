@@ -1,7 +1,6 @@
 """Output formatting module for Job Summary."""
 
 import os
-import re
 
 from actions_advisor.file_parser import AffectedFile, format_github_link
 from actions_advisor.llm_client import AnalysisResult
@@ -70,9 +69,6 @@ def format_analysis(
                 f"{chr(10).join(file_links)}\n\n"
             )
 
-    # Apply red styling to Error Context section
-    styled_analysis = _style_error_context(result.analysis)
-
     # Build markdown output
     markdown = f"""# Actions AI Advisor
 
@@ -80,7 +76,7 @@ def format_analysis(
 {affected_files_section}
 ---
 
-{styled_analysis}
+{result.analysis}
 
 ---
 
@@ -92,48 +88,6 @@ def format_analysis(
 """
 
     return markdown
-
-
-def _style_error_context(analysis: str) -> str:
-    """Apply red styling to Error Context section.
-
-    Args:
-        analysis: LLM-generated analysis markdown
-
-    Returns:
-        Analysis with red-styled error context
-    """
-    # Pattern to match "## Error Context" and everything after until end or next section
-    # Look for the heading, then capture everything until we hit --- or another ## heading
-    pattern = r"(## Error Context\s*\n)((?:(?!^##\s)(?!^---).)*)"
-
-    def style_error(match: re.Match[str]) -> str:
-        heading = match.group(1)  # Keep heading as-is (black)
-        content = match.group(2).strip()  # Error content to style red
-
-        if not content:  # Skip if no content
-            return heading
-
-        # Remove code block markers if present (```...```)
-        content = re.sub(r'^```.*?\n', '', content, flags=re.MULTILINE)
-        content = re.sub(r'\n```$', '', content)
-        content = content.strip()
-
-        # Wrap content in pre tag with red color for better rendering
-        style = (
-            "color: #d73a49; "
-            "background-color: #fff5f5; "
-            "padding: 12px; "
-            "border-left: 4px solid #d73a49; "
-            "border-radius: 4px; "
-            "overflow-x: auto;"
-        )
-        styled_content = f'<pre style="{style}">{content}</pre>'
-        return f'{heading}\n{styled_content}\n'
-
-    # Apply styling if Error Context section exists
-    styled = re.sub(pattern, style_error, analysis, flags=re.MULTILINE | re.DOTALL)
-    return styled
 
 
 def _format_duration(seconds: int | None) -> str:
