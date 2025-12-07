@@ -103,13 +103,22 @@ def _style_error_context(analysis: str) -> str:
     Returns:
         Analysis with red-styled error context
     """
-    # Pattern to match "## Error Context" heading and its content
-    # Captures content until next ## heading or end of string
-    pattern = r"(## Error Context\s*\n)(.*?)(?=\n##|\Z)"
+    # Pattern to match "## Error Context" and everything after until end or next section
+    # Look for the heading, then capture everything until we hit --- or another ## heading
+    pattern = r"(## Error Context\s*\n)((?:(?!^##\s)(?!^---).)*)"
 
     def style_error(match: re.Match[str]) -> str:
         heading = match.group(1)  # Keep heading as-is (black)
         content = match.group(2).strip()  # Error content to style red
+
+        if not content:  # Skip if no content
+            return heading
+
+        # Remove code block markers if present (```...```)
+        content = re.sub(r'^```.*?\n', '', content, flags=re.MULTILINE)
+        content = re.sub(r'\n```$', '', content)
+        content = content.strip()
+
         # Wrap content in pre tag with red color for better rendering
         style = (
             "color: #d73a49; "
@@ -123,7 +132,7 @@ def _style_error_context(analysis: str) -> str:
         return f'{heading}\n{styled_content}\n'
 
     # Apply styling if Error Context section exists
-    styled = re.sub(pattern, style_error, analysis, flags=re.DOTALL)
+    styled = re.sub(pattern, style_error, analysis, flags=re.MULTILINE | re.DOTALL)
     return styled
 
 
