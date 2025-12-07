@@ -1,6 +1,7 @@
 """Output formatting module for Job Summary."""
 
 import os
+import re
 
 from actions_advisor.file_parser import AffectedFile, format_github_link
 from actions_advisor.llm_client import AnalysisResult
@@ -69,6 +70,9 @@ def format_analysis(
                 f"{chr(10).join(file_links)}\n\n"
             )
 
+    # Apply red styling to Error Context section
+    styled_analysis = _style_error_context(result.analysis)
+
     # Build markdown output
     markdown = f"""# Actions AI Advisor
 
@@ -76,7 +80,7 @@ def format_analysis(
 {affected_files_section}
 ---
 
-{result.analysis}
+{styled_analysis}
 
 ---
 
@@ -88,6 +92,30 @@ def format_analysis(
 """
 
     return markdown
+
+
+def _style_error_context(analysis: str) -> str:
+    """Apply red styling to Error Context section.
+
+    Args:
+        analysis: LLM-generated analysis markdown
+
+    Returns:
+        Analysis with red-styled error context
+    """
+    # Pattern to match "## Error Context" heading and its content
+    # Captures content until next ## heading or end of string
+    pattern = r"(## Error Context\s*\n)(.*?)(?=\n##|\Z)"
+
+    def style_error(match: re.Match[str]) -> str:
+        heading = match.group(1)  # Keep heading as-is (black)
+        content = match.group(2)  # Error content to style red
+        # Wrap content in red span (GitHub's error red color)
+        return f'{heading}<span style="color: #d73a49;">\n\n{content}</span>'
+
+    # Apply styling if Error Context section exists
+    styled = re.sub(pattern, style_error, analysis, flags=re.DOTALL)
+    return styled
 
 
 def _format_duration(seconds: int | None) -> str:

@@ -265,10 +265,27 @@ The `multiply()` function uses addition instead of multiplication.
    - return a + b
    + return a * b
 
+## Error Context
+```
+
+<span style="color: #d73a49;">
+
+```
+FAILED tests/test_calculator.py::test_multiply
+  AssertionError: assert 8 == 20
+    Expected: 20 (5 * 4)
+    Got: 8 (5 + 4)
+```
+
+</span>
+
+```
 ---
 
 **Model:** `gpt-4o-mini` | **Tokens:** 3,247 in + 423 out | **Cost:** ~$0.0005
 ```
+
+**Note:** Error messages appear in <span style="color: #d73a49;">**red**</span> for quick identification.
 
 [See full output format details →](docs/llm-integration.md#5-rich-markdown-output-to-job-summary)
 
