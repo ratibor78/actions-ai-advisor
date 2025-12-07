@@ -111,7 +111,15 @@ def _style_error_context(analysis: str) -> str:
         heading = match.group(1)  # Keep heading as-is (black)
         content = match.group(2).strip()  # Error content to style red
         # Wrap content in pre tag with red color for better rendering
-        styled_content = f'<pre style="color: #d73a49; background-color: #fff5f5; padding: 12px; border-left: 4px solid #d73a49; border-radius: 4px; overflow-x: auto;">{content}</pre>'
+        style = (
+            "color: #d73a49; "
+            "background-color: #fff5f5; "
+            "padding: 12px; "
+            "border-left: 4px solid #d73a49; "
+            "border-radius: 4px; "
+            "overflow-x: auto;"
+        )
+        styled_content = f'<pre style="{style}">{content}</pre>'
         return f'{heading}\n{styled_content}\n'
 
     # Apply styling if Error Context section exists
