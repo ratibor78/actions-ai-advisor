@@ -1,6 +1,7 @@
 """Module for fetching failed job logs from GitHub API."""
 
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -41,18 +42,17 @@ class LogFetcher:
     async def fetch_failed_jobs(self) -> list[JobLog]:
         """Fetch all failed jobs and their logs for the run.
 
+        Handles pagination to support workflows with >30 jobs (e.g., matrix builds).
+
         Returns:
             List of JobLog objects for failed jobs
         """
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            # Get all jobs for the run
-            jobs_url = f"{self.base_url}/repos/{self.repo}/actions/runs/{self.run_id}/jobs"
-            response = await client.get(jobs_url, headers=self.headers)
-            response.raise_for_status()
-            jobs_data = response.json()
+            # Fetch all jobs across all pages (GitHub paginates at 30 per page by default)
+            all_jobs = await self._fetch_all_jobs(client)
 
             failed_jobs: list[JobLog] = []
-            for job in jobs_data.get("jobs", []):
+            for job in all_jobs:
                 conclusion = job.get("conclusion")
                 if conclusion in ("failure", "cancelled"):
                     # Extract job metadata
@@ -98,6 +98,48 @@ class LogFetcher:
                     )
 
             return failed_jobs
+
+    async def _fetch_all_jobs(self, client: httpx.AsyncClient) -> list[dict[str, Any]]:
+        """Fetch all jobs for the run, handling pagination.
+
+        GitHub API paginates at 30 jobs per page by default. This method
+        fetches all pages to ensure we don't miss failures in large matrix builds.
+
+        Args:
+            client: HTTP client to use
+
+        Returns:
+            List of all job objects from GitHub API
+        """
+        all_jobs = []
+        page = 1
+        per_page = 100  # Request max per page to minimize API calls
+
+        while True:
+            jobs_url = (
+                f"{self.base_url}/repos/{self.repo}/actions/runs/{self.run_id}/jobs"
+                f"?page={page}&per_page={per_page}"
+            )
+            response = await client.get(jobs_url, headers=self.headers)
+            response.raise_for_status()
+            jobs_data = response.json()
+
+            jobs = jobs_data.get("jobs", [])
+            if not jobs:
+                # No more jobs, we've reached the end
+                break
+
+            all_jobs.extend(jobs)
+
+            # Check if there are more pages
+            total_count = jobs_data.get("total_count", 0)
+            if len(all_jobs) >= total_count:
+                # We've fetched all jobs
+                break
+
+            page += 1
+
+        return all_jobs
 
     async def _fetch_job_logs(self, client: httpx.AsyncClient, job_id: int) -> str:
         """Fetch logs for a specific job.

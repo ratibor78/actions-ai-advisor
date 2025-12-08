@@ -29,27 +29,30 @@ class AffectedFile:
 
 
 # Common error patterns across languages (covers ~90% of cases)
+# Pattern component for cross-platform paths (Windows: C:\path\file, Unix: /path/file)
+PATH_PATTERN = r"(?:[A-Za-z]:[\\/])?[\w.\/\\\-]+"
+
 FILE_PATTERNS = [
-    # Python traceback: File "/path/to/file.py", line 123
+    # Python traceback: File "/path/to/file.py", line 123 (handles both / and \)
     re.compile(r'File "(?P<file>[^"]+\.(?:py|pyx))", line (?P<line>\d+)'),
     # PHP errors: in /path/to/file.php on line 4
-    re.compile(r" in (?P<file>[^\s]+\.php) on line (?P<line>\d+)"),
-    # .NET/C# errors: Program.cs(10,31): error CS0103
-    re.compile(r"(?P<file>[\w./\-]+\.cs)\((?P<line>\d+),\d+\):"),
-    # Linters/type checkers with quoted files: mypy: "src/types.py"
+    re.compile(rf" in (?P<file>{PATH_PATTERN}\.php) on line (?P<line>\d+)"),
+    # .NET/C# errors: Program.cs(10,31): error CS0103 or C:\path\Program.cs(10,31)
+    re.compile(rf"(?P<file>{PATH_PATTERN}\.cs)\((?P<line>\d+),\d+\):"),
+    # Linters/type checkers with quoted files: mypy: "src/types.py" or "src\types.py"
     re.compile(r'(?:mypy|ruff|pylint|flake8|pyright|black):\s+"(?P<file>[^"]+)"'),
     # Dockerfile errors: Dockerfile:4
     re.compile(r"(?P<file>Dockerfile(?:\.[a-z]+)?):(?P<line>\d+)"),
-    # Generic: file.py:123 or file.py:123:45 (expanded to include more extensions)
-    re.compile(r"(?P<file>[\w./\-]+\.(?:py|js|ts|tsx|jsx|go|rs|rb|java|cpp|c|h|cs|php|swift|kt|scala)):(?P<line>\d+)(?::\d+)?"),
-    # Node.js stack: at /path/to/file.js:123:45
-    re.compile(r"at (?P<file>[\w./\-]+\.(?:js|ts|tsx|jsx)):(?P<line>\d+):\d+"),
+    # Generic: file.py:123 or file.py:123:45 (Windows: C:\path\file.py:123)
+    re.compile(rf"(?P<file>{PATH_PATTERN}\.(?:py|js|ts|tsx|jsx|go|rs|rb|java|cpp|c|h|cs|php|swift|kt|scala)):(?P<line>\d+)(?::\d+)?"),
+    # Node.js stack: at /path/to/file.js:123:45 or at C:\path\file.js:123:45
+    re.compile(rf"at (?P<file>{PATH_PATTERN}\.(?:js|ts|tsx|jsx)):(?P<line>\d+):\d+"),
     # Common extensionless files: Makefile, CMakeLists.txt
     re.compile(r"(?P<file>(?:Makefile|CMakeLists\.txt|Gemfile|Rakefile)):(?P<line>\d+)"),
-    # Webpack: Module not found: Error: Can't resolve './src'
-    re.compile(r"Can't resolve ['\"](?P<file>[\w./\-]+)['\"]"),
-    # Generic file mention: checking src/main.py
-    re.compile(r"(?:checking|in|file|from|import)\s+(?P<file>[\w./\-]+\.(?:py|js|ts|go|rs|rb|java))"),
+    # Webpack: Module not found: Error: Can't resolve './src' or '.\src'
+    re.compile(rf"Can't resolve ['\"](?P<file>{PATH_PATTERN})['\"]"),
+    # Generic file mention: checking src/main.py or src\main.py
+    re.compile(rf"(?:checking|in|file|from|import)\s+(?P<file>{PATH_PATTERN}\.(?:py|js|ts|go|rs|rb|java))"),
 ]
 
 
@@ -148,18 +151,33 @@ def _looks_like_incomplete_path(path: str) -> bool:
 
 
 def _normalize_file_path(path: str) -> str | None:
-    """Normalize file paths to relative project paths.
+    r"""Normalize file paths to relative project paths (cross-platform).
+
+    Handles both Unix paths (/path/to/file) and Windows paths (C:\path\to\file).
+    Converts all paths to Unix-style (forward slashes) for consistency.
 
     Args:
         path: Raw file path from error logs
 
     Returns:
-        Normalized relative path, or None if path is invalid
+        Normalized relative path with forward slashes, or None if path is invalid
     """
-    # GitHub Actions workspace: /home/runner/work/{repo}/{repo}/...
+    # First, normalize backslashes to forward slashes for consistent processing
+    normalized = path.replace("\\", "/")
+
+    # Windows GitHub Actions: D:/a/{repo}/{repo}/... (after backslash conversion)
+    # Example: D:/a/myrepo/myrepo/src/file.py -> src/file.py
+    if re.match(r"^[A-Za-z]:/a/", normalized):
+        parts = normalized.split("/")
+        # Structure: ['D:', 'a', 'repo', 'repo', 'src', 'file.py']
+        # Skip drive, 'a', repo name, repo name again (first 4 parts)
+        if len(parts) > 4:
+            return "/".join(parts[4:])
+
+    # Linux GitHub Actions workspace: /home/runner/work/{repo}/{repo}/...
     # Extract relative path after the second occurrence of repo name
-    if "/home/runner/work/" in path:
-        parts = path.split("/")
+    if "/home/runner/work/" in normalized:
+        parts = normalized.split("/")
         try:
             work_idx = parts.index("work")
             # Skip 'work', repo name, repo name again, then take the rest
@@ -169,27 +187,40 @@ def _normalize_file_path(path: str) -> str | None:
             pass
 
     # Jenkins/other CI: /workspace/...
-    if path.startswith("/workspace/"):
-        return path.replace("/workspace/", "", 1)
+    if normalized.startswith("/workspace/"):
+        return normalized.replace("/workspace/", "", 1)
 
     # CircleCI: /home/circleci/project/...
-    if "/home/circleci/project/" in path:
-        return path.split("/home/circleci/project/", 1)[1]
+    if "/home/circleci/project/" in normalized:
+        return normalized.split("/home/circleci/project/", 1)[1]
+
+    # Strip Windows drive letter for absolute paths (C:/project/src -> project/src)
+    # But keep paths that are already relative
+    drive_match = re.match(r"^[A-Za-z]:/(.+)", normalized)
+    if drive_match:
+        # This is a Windows absolute path - try to extract repo-relative part
+        # Common pattern: C:/Users/runner/project/src/file.py
+        remaining_path = drive_match.group(1)
+        # If it contains common workspace indicators, try to extract from there
+        if "/project/" in remaining_path:
+            return remaining_path.split("/project/", 1)[1]
+        # Otherwise, just remove the drive letter and hope it's relative-ish
+        return remaining_path
 
     # Clean relative path prefixes
-    if path.startswith("./"):
-        path = path[2:]  # Remove ./
+    if normalized.startswith("./"):
+        normalized = normalized[2:]  # Remove ./
 
     # Parent directory references are not resolvable in repo context
-    if path.startswith("../"):
+    if normalized.startswith("../"):
         return None
 
     # Unknown absolute paths (not CI workspace) are likely not resolvable
-    if path.startswith("/"):
+    if normalized.startswith("/"):
         return None
 
     # Already relative or simple path
-    return path
+    return normalized
 
 
 def _is_valid_file_path(path: str) -> bool:

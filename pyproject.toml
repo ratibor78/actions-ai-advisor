@@ -19,6 +19,7 @@ dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
     "pytest-cov>=6.0",
+    "respx>=0.22.0",
     "mypy>=1.13",
     "ruff>=0.8",
 ]
@@ -49,8 +50,3 @@ disallow_untyped_defs = true
 testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "--strict-markers"
-
-[dependency-groups]
-dev = [
-    "respx>=0.22.0",
-]
