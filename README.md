@@ -31,6 +31,8 @@
 - **Intelligent analysis** — AI-powered root cause analysis directly in workflow summaries
 - **Affected files detection** — Automatically extracts and links to files mentioned in errors
 - **Multi-language support** — 10+ languages: Python, JS/TS, Go, Rust, Java, C#, PHP, Ruby, C/C++
+- **Cross-platform paths** — Works with both Linux (`/path/file`) and Windows (`C:\path\file`) runners
+- **Matrix build support** — Handles workflows with 100+ jobs via automatic pagination
 - **Smart preprocessing** — Reduces logs by 70%+ to minimize token costs
 - **Clickable file links** — Direct navigation to error locations with line numbers
 - **Working directory detection** — Resolves paths correctly for monorepos (Rust Cargo, Go modules)
@@ -47,7 +49,7 @@ Supports **10+ languages** with automatic file path extraction and clickable Git
 
 **Python** • **JavaScript/TypeScript** • **Go** • **Rust** • **Java** • **.NET/C#** • **PHP** • **Ruby** • **C/C++** • **Docker**
 
-**Features:** Context-aware path resolution • Library file filtering • Monorepo support • 70% token reduction
+**Features:** Cross-platform paths (Linux + Windows) • Context-aware path resolution • Library file filtering • Monorepo support • 70% token reduction
 
 [See detailed language support →](docs/language-support.md)
 
@@ -57,9 +59,9 @@ Supports **10+ languages** with automatic file path extraction and clickable Git
 
 Actions AI Advisor automatically analyzes failed workflows in 5 steps:
 
-1. **Fetches logs** from GitHub Actions API when a job fails
+1. **Fetches logs** from GitHub Actions API when a job fails (with pagination for matrix builds)
 2. **Preprocesses** to remove noise and reduce tokens by ~70%
-3. **Extracts file paths** from error messages (10+ languages supported)
+3. **Extracts file paths** from error messages (10+ languages, Linux + Windows paths)
 4. **Sends to LLM** for intelligent root cause analysis
 5. **Outputs** formatted markdown to GitHub Job Summary with clickable file links
 

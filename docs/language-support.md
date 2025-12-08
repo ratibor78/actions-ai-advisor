@@ -16,7 +16,15 @@ This document provides detailed information about language-specific error detect
 
 ## Overview
 
-Actions AI Advisor supports **10+ programming languages** with varying levels of intelligence:
+Actions AI Advisor supports **10+ programming languages** with varying levels of intelligence, with **full cross-platform support** for both Linux and Windows runners.
+
+### Cross-Platform Support
+
+All language patterns support **both Unix and Windows paths**:
+- **Linux/Unix:** `/path/to/file.py`, `./src/main.js`
+- **Windows:** `C:\path\to\file.py`, `D:\a\repo\repo\src\main.js`
+- **Normalization:** All paths converted to Unix-style (`/`) for GitHub links
+- **Drive letters:** Automatically stripped and normalized to repo-relative paths
 
 ### Support Tiers
 
@@ -25,10 +33,12 @@ Actions AI Advisor supports **10+ programming languages** with varying levels of
 - Framework/tool detection (pytest, Jest, Cargo, etc.)
 - Working directory resolution
 - Library file filtering
+- Cross-platform path handling
 
 **Supported (Regex-Based)**
 - Generic pattern matching
 - Line number extraction
+- Cross-platform path handling
 - No context awareness
 - No library filtering
 
@@ -348,17 +358,26 @@ When multiple patterns match, the following priority is used:
 
 ### Path Normalization
 
-All extracted paths are normalized:
+All extracted paths are normalized for cross-platform compatibility:
 
-1. **Strip CI workspace prefix:**
-   - `/home/runner/work/repo/repo/src/main.py` → `src/main.py`
-2. **Convert backslashes (Windows):**
+1. **Convert Windows paths to Unix-style:**
+   - `C:\Users\runner\project\src\main.py` → forward slashes
+   - `D:\a\repo\repo\src\app.js` → `src/app.js` (strip workspace + drive)
    - `src\app\main.py` → `src/app/main.py`
+
+2. **Strip CI workspace prefixes:**
+   - **Linux:** `/home/runner/work/repo/repo/src/main.py` → `src/main.py`
+   - **Windows:** `D:/a/repo/repo/src/main.py` → `src/main.py` (after backslash conversion)
+   - **Jenkins:** `/workspace/src/main.py` → `src/main.py`
+   - **CircleCI:** `/home/circleci/project/src/main.py` → `src/main.py`
+
 3. **Add working directory prefix (if detected):**
    - `math_test.go` + `pkg/math` context → `pkg/math/math_test.go`
+
 4. **Filter library files:**
    - `java.lang.String` → SKIP
    - `node_modules/foo/index.js` → SKIP
+   - `site-packages/django/core.py` → SKIP
 
 ### Link Generation
 
@@ -382,18 +401,33 @@ To add support for a new language:
 
 Edit `src/actions_advisor/file_parser.py`:
 
+**Option A: Use PATH_PATTERN for cross-platform support (recommended)**
 ```python
-# Example: Adding Julia support
+# Example: Adding Julia support with cross-platform paths
+# PATH_PATTERN = r"(?:[A-Za-z]:[\\/])?[\w.\/\\\-]+"  (already defined)
+
+FILE_PATTERNS = [
+    # ... existing patterns ...
+    # Julia: ERROR: LoadError: file.jl:123
+    re.compile(rf'(?:ERROR: LoadError: )?(?P<file>{PATH_PATTERN}\.jl):(?P<line>\d+)'),
+]
+```
+
+**Option B: Simple pattern (Unix-only, not recommended)**
+```python
+# Example: Adding Julia support (Unix paths only)
 JULIA_PATTERN = re.compile(
-    r'(?:ERROR: LoadError: )?([a-zA-Z0-9_/.-]+\.jl):(\d+)',
+    r'(?:ERROR: LoadError: )?(?P<file>[a-zA-Z0-9_/.-]+\.jl):(?P<line>\d+)',
     re.MULTILINE
 )
 ```
 
 ### 2. Add to Pattern List
 
+The pattern is already in `FILE_PATTERNS` if using Option A. For Option B:
+
 ```python
-LANGUAGE_PATTERNS = [
+FILE_PATTERNS = [
     # ... existing patterns ...
     JULIA_PATTERN,  # Add new pattern
 ]

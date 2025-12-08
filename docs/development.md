@@ -26,6 +26,7 @@ This guide covers how to contribute to Actions AI Advisor, including setup, test
 
 ### Installation
 
+**Using uv (recommended):**
 ```bash
 # Clone repository
 git clone https://github.com/ratibor78/actions-advisor.git
@@ -42,6 +43,27 @@ uv run pytest --version
 uv run ruff --version
 uv run mypy --version
 ```
+
+**Using pip:**
+```bash
+# Clone repository
+git clone https://github.com/ratibor78/actions-advisor.git
+cd actions-advisor
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install with dev dependencies
+pip install -e .[dev]
+
+# Verify installation
+pytest --version
+ruff --version
+mypy --version
+```
+
+**Note:** All development dependencies (including `respx` for HTTP mocking) are now properly included in `[project.optional-dependencies.dev]`, making the project compatible with both `uv` and standard `pip` workflows.
 
 ---
 

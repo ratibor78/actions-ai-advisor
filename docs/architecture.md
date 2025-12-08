@@ -75,6 +75,7 @@ Load    Logs    Logs    Files     Tokens    w/ LLM     Write
 - Fetches failed job metadata from GitHub Actions API
 - Downloads raw logs (follows HTTP 302 redirects)
 - Filters jobs by conclusion status (`failure`, `cancelled`)
+- **Handles pagination** for workflows with 100+ jobs (matrix builds)
 - Rate-limited and authenticated via GitHub token
 
 **Key Classes:**
@@ -82,8 +83,13 @@ Load    Logs    Logs    Files     Tokens    w/ LLM     Write
 - `LogFetcher` — Async client for GitHub API
 
 **API Endpoints:**
-- `GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs` — List jobs
+- `GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs?page={N}&per_page=100` — List jobs (paginated)
 - `GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs` — Download logs
+
+**Pagination:**
+- Fetches 100 jobs per page (GitHub's max)
+- Iterates until `total_count` reached
+- Prevents missing failures in large matrix builds (>30 jobs)
 
 #### 3. **preprocessor.py** — Log Cleaning & Optimization
 - Removes ANSI escape codes (color formatting)
@@ -105,16 +111,19 @@ Load    Logs    Logs    Files     Tokens    w/ LLM     Write
 
 #### 4. **file_parser.py** — File Path Extraction
 - Parses error logs for file paths (10+ language patterns)
+- **Cross-platform support** — Handles both Unix (`/path/file`) and Windows (`C:\path\file`) paths
 - Resolves relative paths using working directory context
 - Filters out library/system files (JDK, site-packages)
 - Generates clickable GitHub links with line numbers
 
 **Key Classes:**
 - `AffectedFile` — Dataclass with file path and line number
+- `PATH_PATTERN` — Cross-platform regex component for both `/` and `\` paths
 - Language-specific regex patterns (Python, JS/TS, Go, Rust, Java, .NET, PHP, Ruby, C/C++, Docker)
 
 **Smart Features:**
-- **Context-aware resolution** — Uses Cargo workspace, Go module paths
+- **Cross-platform paths** — Normalizes Windows backslashes to forward slashes, handles drive letters
+- **Context-aware resolution** — Uses Cargo workspace, Go module paths, Windows GitHub Actions workspace
 - **Library filtering** — Excludes `java.lang.*`, `site-packages/*`
 - **Hybrid linking** — Direct line links or search fallback
 
