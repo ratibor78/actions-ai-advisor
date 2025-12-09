@@ -29,7 +29,6 @@ provide clear, actionable guidance.
 [Key error lines - include stack trace if relevant]
 
 **Style Guidelines:**
-- Use professional terminology (e.g., "Impacted Files" not "Affected Files")
 - Number your recommendations (1. 2. 3.)
 - Include code snippets for fixes when applicable
 - Be concise for obvious errors (syntax errors, missing dependencies, simple config issues)

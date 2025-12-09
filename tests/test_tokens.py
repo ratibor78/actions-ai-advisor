@@ -74,3 +74,30 @@ def test_cost_estimation_zero_tokens():
         input_tokens=0, output_tokens=0, provider="openai", model="gpt-4o-mini"
     )
     assert cost == 0.0
+
+
+def test_cost_estimation_model_alias_normalization():
+    """Test that model names with dots are normalized to hyphens for lookup."""
+    # Test OpenRouter model with dot (claude-3.5-haiku) normalized to hyphen (claude-3-5-haiku)
+    cost_with_dot = TokenCounter.estimate_cost(
+        input_tokens=1000,
+        output_tokens=500,
+        provider="openrouter",
+        model="anthropic/claude-3.5-haiku",  # User passes dot
+    )
+    cost_with_hyphen = TokenCounter.estimate_cost(
+        input_tokens=1000,
+        output_tokens=500,
+        provider="openrouter",
+        model="anthropic/claude-3-5-haiku",  # Pricing table has hyphen
+    )
+
+    # Both should work and return the same cost
+    assert cost_with_dot is not None
+    assert cost_with_hyphen is not None
+    assert cost_with_dot == cost_with_hyphen
+
+    # Verify the actual cost calculation is correct
+    # anthropic/claude-3-5-haiku: (0.80, 4.00) per 1M tokens
+    expected_cost = (1000 * 0.80 + 500 * 4.00) / 1_000_000
+    assert cost_with_dot == expected_cost

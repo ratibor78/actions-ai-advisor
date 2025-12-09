@@ -75,7 +75,14 @@ class TokenCounter:
         if provider not in PRICING:
             return None
 
-        model_pricing = PRICING[provider].get(model)
+        # Normalize model name: convert dots to hyphens for consistent lookup
+        # Example: anthropic/claude-3.5-haiku → anthropic/claude-3-5-haiku
+        normalized_model = model.replace(".", "-")
+
+        # Try normalized model name first, then fall back to original
+        model_pricing = PRICING[provider].get(normalized_model) or PRICING[provider].get(
+            model
+        )
         if not model_pricing:
             return None
 
