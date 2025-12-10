@@ -70,12 +70,6 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
     # Try to detect working directory from build tool output
     working_dir = _extract_working_directory(log_content)
 
-    # Debug: Print working directory detection
-    if working_dir:
-        print(f"🔍 DEBUG: Detected working directory: {working_dir}")
-    else:
-        print("🔍 DEBUG: No working directory detected")
-
     for pattern in FILE_PATTERNS:
         for match in pattern.finditer(log_content):
             file_path = match.group("file")
@@ -93,7 +87,6 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
 
             # If we have a working directory and path looks incomplete, prepend it
             if working_dir and normalized_path and _looks_like_incomplete_path(normalized_path):
-                print(f"🔍 DEBUG: Prepending {working_dir}/ to {normalized_path}")
                 normalized_path = f"{working_dir}/{normalized_path}"
 
             if normalized_path and _is_valid_file_path(normalized_path):
@@ -111,64 +104,66 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
 def _extract_working_directory(log_content: str) -> str | None:
     """Extract working directory from build tool output.
 
-    Looks for patterns like:
+    Handles multiple build tools and log formats:
     - Rust: Compiling rust-app v0.1.0 (/path/to/rust-app)
     - Go: FAIL    example.com/go-app    0.002s
 
+    Robust handling of:
+    - ANSI color codes (common in CI logs)
+    - GitHub Actions timestamps (YYYY-MM-DDTHH:MM:SS.NNNNNNNZ)
+    - Various whitespace patterns
+    - Root vs subdirectory projects
+
     Args:
-        log_content: Raw log content
+        log_content: Raw log content from CI system
 
     Returns:
-        Working directory name, or None if not found
+        Working directory name (e.g., "rust-app"), or None if:
+        - No working directory detected
+        - Root-level project (not in subdirectory)
     """
-    # Debug: Check if "Compiling" appears in logs at all
-    compiling_lines = [line for line in log_content.split('\n') if 'Compiling' in line]
-    if compiling_lines:
-        print(f"🔍 DEBUG: Found {len(compiling_lines)} line(s) with 'Compiling':")
-        for i, line in enumerate(compiling_lines[:3]):  # Show first 3
-            print(f"  [{i+1}] {line[:120]}")
-            # Show repr to see hidden characters
-            print(f"       repr: {repr(line[:80])}")
-    else:
-        print("🔍 DEBUG: No 'Compiling' lines found in logs")
+    # Step 1: Strip ANSI escape codes (color, bold, etc.)
+    # GitHub Actions and most CI systems colorize output, which breaks pattern matching
+    # Example: \x1b[1m\x1b[92mCompiling\x1b[0m → Compiling
+    ansi_escape = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
+    clean_content = ansi_escape.sub("", log_content)
 
-    # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
-    # Extract the last directory component from the path
-    # But only if it's not just the repo root (GitHub Actions uses /work/{repo}/{repo}/)
-    # Note: Raw logs may have timestamps, so allow optional timestamp prefix
+    # Step 2: Rust/Cargo working directory detection
+    # Matches: Compiling rust-app v0.1.0 (/home/runner/work/test-actions-advisor/test-actions-advisor/rust-app)
+    # Handles:
+    # - Optional GitHub Actions timestamp prefix: 2025-12-10T08:16:46.5215607Z
+    # - Flexible whitespace between timestamp and "Compiling"
+    # - Any Rust package name and version format
+    # - Cross-platform paths (Unix and Windows)
     rust_pattern = re.compile(
-        r"(?:^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+)?Compiling \S+ v[\d.]+ \((?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))\)",
-        re.MULTILINE
+        r"""
+        (?:^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+)?  # Optional timestamp + whitespace
+        Compiling\s+                                          # "Compiling" + whitespace
+        \S+\s+                                                # Package name + whitespace
+        v[\d.]+(?:-[a-zA-Z0-9.]+)?\s+                        # Version (e.g., v0.1.0 or v0.1.0-beta) + whitespace
+        \(                                                    # Opening parenthesis
+        (?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))  # Capture path components
+        \)                                                    # Closing parenthesis
+        """,
+        re.MULTILINE | re.VERBOSE
     )
-    match = rust_pattern.search(log_content)
+
+    match = rust_pattern.search(clean_content)
     if match:
         parent = match.group("parent")
         last = match.group("last")
-        full_path = match.group("full_path")
-        print(f"🔍 DEBUG: Rust pattern matched! full_path={full_path}, parent={parent}, last={last}")
-        # Only use last component as working dir if it's different from parent
-        # This handles GitHub Actions pattern: /work/{repo}/{repo}/{subdir}
-        # - If parent == last: root project (/work/myrepo/myrepo) → return None
-        # - If parent != last: subdirectory (/work/myrepo/myrepo/backend) → return "backend"
-        if parent != last:
-            print(f"🔍 DEBUG: Using working directory: {last}")
-            return last
-        else:
-            print(f"🔍 DEBUG: Root project detected (parent == last), not using working directory")
-    else:
-        print("🔍 DEBUG: Rust pattern did NOT match")
-        # Try to manually test if compiling_lines[0] matches
-        if compiling_lines:
-            test_line = compiling_lines[0]
-            test_match = rust_pattern.search(test_line)
-            if test_match:
-                print(f"🔍 DEBUG: BUT pattern DOES match when tested on line directly!")
-            else:
-                print(f"🔍 DEBUG: Pattern also doesn't match when tested on line directly")
 
-    # Go: FAIL    example.com/go-app    0.002s
+        # GitHub Actions pattern: /home/runner/work/{repo}/{repo}/{subdir}
+        # Only use the last component as working directory if it differs from parent
+        # - If parent == last: root project (e.g., /work/myrepo/myrepo) → return None
+        # - If parent != last: subdirectory (e.g., /work/myrepo/myrepo/backend) → return "backend"
+        if parent != last:
+            return last
+
+    # Step 3: Go test working directory detection
+    # Matches: FAIL    example.com/go-app    0.002s
     go_pattern = re.compile(r"^FAIL\s+\S+/(\S+?)\s+[\d.]+s$", re.MULTILINE)
-    match = go_pattern.search(log_content)
+    match = go_pattern.search(clean_content)
     if match:
         return match.group(1)
 

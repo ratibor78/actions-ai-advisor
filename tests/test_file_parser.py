@@ -356,3 +356,29 @@ assertion failed
     assert any(f.file_path == "src/main.rs" and f.line_start == 25 for f in files)
     # Should NOT have myrepo prefix
     assert not any("myrepo/" in f.file_path for f in files)
+
+
+def test_parse_rust_with_ansi_codes_and_timestamps():
+    """Test parsing Rust logs with ANSI color codes and GitHub Actions timestamps."""
+    # Real log format from GitHub Actions with ANSI codes
+    log = """
+2025-12-10T08:16:46.5215607Z \x1b[1m\x1b[92m   Compiling\x1b[0m rust-app v0.1.0 (/home/runner/work/test-actions-advisor/test-actions-advisor/rust-app)
+2025-12-10T08:16:52.1234567Z     Finished `test` profile [unoptimized + debuginfo] target(s) in 5.60s
+2025-12-10T08:16:52.2345678Z      Running unittests src/lib.rs (target/debug/deps/rust_app-abc123)
+2025-12-10T08:16:52.3456789Z
+2025-12-10T08:16:52.4567890Z running 1 test
+2025-12-10T08:16:52.5678901Z test tests::test_add ... \x1b[1m\x1b[91mFAILED\x1b[0m
+2025-12-10T08:16:52.6789012Z
+2025-12-10T08:16:52.7890123Z failures:
+2025-12-10T08:16:52.8901234Z
+2025-12-10T08:16:52.9012345Z ---- tests::test_add stdout ----
+2025-12-10T08:16:53.0123456Z thread 'tests::test_add' panicked at src/lib.rs:11:9:
+2025-12-10T08:16:53.1234567Z assertion `left == right` failed
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find rust-app/src/lib.rs (with rust-app prefix from Compiling line)
+    assert any(f.file_path == "rust-app/src/lib.rs" and f.line_start == 11 for f in files)
+    # Verify it's not just src/lib.rs
+    assert not any(f.file_path == "src/lib.rs" for f in files)
