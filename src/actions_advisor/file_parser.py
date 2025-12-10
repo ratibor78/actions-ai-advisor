@@ -115,7 +115,8 @@ def _extract_working_directory(log_content: str) -> str | None:
         Working directory name, or None if not found
     """
     # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
-    rust_pattern = re.compile(r"Compiling \S+ v[\d.]+ \([^\)]+/(\S+)\)")
+    # Extract the last directory component from the path
+    rust_pattern = re.compile(r"Compiling \S+ v[\d.]+ \(.*?/([^/\)]+)\)")
     match = rust_pattern.search(log_content)
     if match:
         return match.group(1)
