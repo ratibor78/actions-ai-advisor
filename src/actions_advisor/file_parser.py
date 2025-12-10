@@ -121,6 +121,15 @@ def _extract_working_directory(log_content: str) -> str | None:
     Returns:
         Working directory name, or None if not found
     """
+    # Debug: Check if "Compiling" appears in logs at all
+    compiling_lines = [line for line in log_content.split('\n') if 'Compiling' in line]
+    if compiling_lines:
+        print(f"🔍 DEBUG: Found {len(compiling_lines)} line(s) with 'Compiling':")
+        for i, line in enumerate(compiling_lines[:3]):  # Show first 3
+            print(f"  [{i+1}] {line[:120]}")
+    else:
+        print("🔍 DEBUG: No 'Compiling' lines found in logs")
+
     # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
     # Extract the last directory component from the path
     # But only if it's not just the repo root (GitHub Actions uses /work/{repo}/{repo}/)
