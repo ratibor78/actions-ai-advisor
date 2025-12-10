@@ -129,7 +129,7 @@ def _extract_working_directory(log_content: str) -> str | None:
     clean_content = ansi_escape.sub("", log_content)
 
     # Step 2: Rust/Cargo working directory detection
-    # Matches: Compiling rust-app v0.1.0 (/home/runner/work/test-actions-advisor/test-actions-advisor/rust-app)
+    # Matches: Compiling rust-app v0.1.0 (/home/runner/work/repo/repo/rust-app)
     # Handles:
     # - Optional GitHub Actions timestamp prefix: 2025-12-10T08:16:46.5215607Z
     # - Flexible whitespace between timestamp and "Compiling"
@@ -137,13 +137,13 @@ def _extract_working_directory(log_content: str) -> str | None:
     # - Cross-platform paths (Unix and Windows)
     rust_pattern = re.compile(
         r"""
-        (?:^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+)?  # Optional timestamp + whitespace
-        Compiling\s+                                          # "Compiling" + whitespace
-        \S+\s+                                                # Package name + whitespace
-        v[\d.]+(?:-[a-zA-Z0-9.]+)?\s+                        # Version (e.g., v0.1.0 or v0.1.0-beta) + whitespace
-        \(                                                    # Opening parenthesis
-        (?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))  # Capture path components
-        \)                                                    # Closing parenthesis
+        (?:^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+)?  # Optional timestamp
+        Compiling\s+                                          # "Compiling"
+        \S+\s+                                                # Package name
+        v[\d.]+(?:-[a-zA-Z0-9.]+)?\s+                        # Version (v0.1.0)
+        \(                                                    # Opening paren
+        (?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))  # Path parts
+        \)                                                    # Closing paren
         """,
         re.MULTILINE | re.VERBOSE
     )
