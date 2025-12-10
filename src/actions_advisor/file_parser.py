@@ -70,6 +70,12 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
     # Try to detect working directory from build tool output
     working_dir = _extract_working_directory(log_content)
 
+    # Debug: Print working directory detection
+    if working_dir:
+        print(f"🔍 DEBUG: Detected working directory: {working_dir}")
+    else:
+        print("🔍 DEBUG: No working directory detected")
+
     for pattern in FILE_PATTERNS:
         for match in pattern.finditer(log_content):
             file_path = match.group("file")
@@ -87,6 +93,7 @@ def parse_affected_files(log_content: str) -> list[AffectedFile]:
 
             # If we have a working directory and path looks incomplete, prepend it
             if working_dir and normalized_path and _looks_like_incomplete_path(normalized_path):
+                print(f"🔍 DEBUG: Prepending {working_dir}/ to {normalized_path}")
                 normalized_path = f"{working_dir}/{normalized_path}"
 
             if normalized_path and _is_valid_file_path(normalized_path):
@@ -124,12 +131,17 @@ def _extract_working_directory(log_content: str) -> str | None:
     if match:
         parent = match.group("parent")
         last = match.group("last")
+        full_path = match.group("full_path")
+        print(f"🔍 DEBUG: Rust pattern matched! full_path={full_path}, parent={parent}, last={last}")
         # Only use last component as working dir if it's different from parent
         # This handles GitHub Actions pattern: /work/{repo}/{repo}/{subdir}
         # - If parent == last: root project (/work/myrepo/myrepo) → return None
         # - If parent != last: subdirectory (/work/myrepo/myrepo/backend) → return "backend"
         if parent != last:
+            print(f"🔍 DEBUG: Using working directory: {last}")
             return last
+        else:
+            print(f"🔍 DEBUG: Root project detected (parent == last), not using working directory")
 
     # Go: FAIL    example.com/go-app    0.002s
     go_pattern = re.compile(r"^FAIL\s+\S+/(\S+?)\s+[\d.]+s$", re.MULTILINE)
