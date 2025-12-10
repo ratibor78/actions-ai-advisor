@@ -133,8 +133,10 @@ def _extract_working_directory(log_content: str) -> str | None:
     # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
     # Extract the last directory component from the path
     # But only if it's not just the repo root (GitHub Actions uses /work/{repo}/{repo}/)
+    # Note: Raw logs may have timestamps, so allow optional timestamp prefix
     rust_pattern = re.compile(
-        r"Compiling \S+ v[\d.]+ \((?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))\)"
+        r"(?:^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+)?Compiling \S+ v[\d.]+ \((?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))\)",
+        re.MULTILINE
     )
     match = rust_pattern.search(log_content)
     if match:
