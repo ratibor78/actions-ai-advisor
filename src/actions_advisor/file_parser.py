@@ -127,6 +127,8 @@ def _extract_working_directory(log_content: str) -> str | None:
         print(f"🔍 DEBUG: Found {len(compiling_lines)} line(s) with 'Compiling':")
         for i, line in enumerate(compiling_lines[:3]):  # Show first 3
             print(f"  [{i+1}] {line[:120]}")
+            # Show repr to see hidden characters
+            print(f"       repr: {repr(line[:80])}")
     else:
         print("🔍 DEBUG: No 'Compiling' lines found in logs")
 
@@ -153,6 +155,16 @@ def _extract_working_directory(log_content: str) -> str | None:
             return last
         else:
             print(f"🔍 DEBUG: Root project detected (parent == last), not using working directory")
+    else:
+        print("🔍 DEBUG: Rust pattern did NOT match")
+        # Try to manually test if compiling_lines[0] matches
+        if compiling_lines:
+            test_line = compiling_lines[0]
+            test_match = rust_pattern.search(test_line)
+            if test_match:
+                print(f"🔍 DEBUG: BUT pattern DOES match when tested on line directly!")
+            else:
+                print(f"🔍 DEBUG: Pattern also doesn't match when tested on line directly")
 
     # Go: FAIL    example.com/go-app    0.002s
     go_pattern = re.compile(r"^FAIL\s+\S+/(\S+?)\s+[\d.]+s$", re.MULTILINE)
