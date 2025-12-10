@@ -334,3 +334,25 @@ java.lang.AssertionError: expected:<2> but was:<3>
     assert "Method.java" not in file_paths
     assert "ArrayList.java" not in file_paths
     assert "Thread.java" not in file_paths
+
+
+def test_parse_rust_root_project_no_working_directory():
+    """Test that root-level Rust projects don't incorrectly extract repo name as working dir."""
+    log = """
+Compiling myapp v0.1.0 (/home/runner/work/myrepo/myrepo)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.21s
+     Running unittests src/main.rs (target/debug/deps/myapp-abc123)
+
+running 1 test
+test tests::test_foo ... FAILED
+
+thread 'tests::test_foo' panicked at src/main.rs:25:5:
+assertion failed
+"""
+    files = parse_affected_files(log)
+
+    assert len(files) >= 1
+    # Should find src/main.rs (NOT myrepo/src/main.rs)
+    assert any(f.file_path == "src/main.rs" and f.line_start == 25 for f in files)
+    # Should NOT have myrepo prefix
+    assert not any("myrepo/" in f.file_path for f in files)

@@ -116,10 +116,20 @@ def _extract_working_directory(log_content: str) -> str | None:
     """
     # Rust: Compiling package v0.1.0 (/home/runner/work/repo/repo/rust-app)
     # Extract the last directory component from the path
-    rust_pattern = re.compile(r"Compiling \S+ v[\d.]+ \(.*?/([^/\)]+)\)")
+    # But only if it's not just the repo root (GitHub Actions uses /work/{repo}/{repo}/)
+    rust_pattern = re.compile(
+        r"Compiling \S+ v[\d.]+ \((?P<full_path>.*?/(?P<parent>[^/]+)/(?P<last>[^/\)]+))\)"
+    )
     match = rust_pattern.search(log_content)
     if match:
-        return match.group(1)
+        parent = match.group("parent")
+        last = match.group("last")
+        # Only use last component as working dir if it's different from parent
+        # This handles GitHub Actions pattern: /work/{repo}/{repo}/{subdir}
+        # - If parent == last: root project (/work/myrepo/myrepo) → return None
+        # - If parent != last: subdirectory (/work/myrepo/myrepo/backend) → return "backend"
+        if parent != last:
+            return last
 
     # Go: FAIL    example.com/go-app    0.002s
     go_pattern = re.compile(r"^FAIL\s+\S+/(\S+?)\s+[\d.]+s$", re.MULTILINE)
