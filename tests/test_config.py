@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from actions_advisor.config import Config
+from actions_ai_advisor.config import Config
 
 
 def test_config_with_defaults(sample_github_env: dict[str, str]) -> None:

@@ -1,5 +1,5 @@
 [project]
-name = "actions-advisor"
+name = "actions-ai-advisor"
 version = "0.1.0"
 description = "AI-powered GitHub Actions failure analysis"
 readme = "README.md"
@@ -25,7 +25,7 @@ dev = [
 ]
 
 [project.scripts]
-actions-advisor = "actions_advisor.main:main"
+actions-ai-advisor = "actions_ai_advisor.main:main"
 
 [build-system]
 requires = ["hatchling"]

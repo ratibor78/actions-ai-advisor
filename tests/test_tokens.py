@@ -1,6 +1,6 @@
 """Tests for token counting and cost estimation."""
 
-from actions_advisor.tokens import TokenCounter
+from actions_ai_advisor.tokens import TokenCounter
 
 
 def test_token_counting():

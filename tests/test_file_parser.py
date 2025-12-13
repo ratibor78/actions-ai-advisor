@@ -1,6 +1,6 @@
 """Tests for file parser module."""
 
-from actions_advisor.file_parser import (
+from actions_ai_advisor.file_parser import (
     AffectedFile,
     format_github_link,
     parse_affected_files,
@@ -250,7 +250,7 @@ def test_format_github_link_search_for_filename_only():
 
 def test_normalize_removes_dot_slash():
     """Test that ./ prefix is removed from paths."""
-    from actions_advisor.file_parser import _normalize_file_path
+    from actions_ai_advisor.file_parser import _normalize_file_path
 
     assert _normalize_file_path("./src/main.py") == "src/main.py"
     assert _normalize_file_path("./test.py") == "test.py"
@@ -258,7 +258,7 @@ def test_normalize_removes_dot_slash():
 
 def test_normalize_rejects_parent_directory():
     """Test that ../ paths are rejected."""
-    from actions_advisor.file_parser import _normalize_file_path
+    from actions_ai_advisor.file_parser import _normalize_file_path
 
     assert _normalize_file_path("../src/main.py") is None
     assert _normalize_file_path("../../test.py") is None
@@ -266,7 +266,7 @@ def test_normalize_rejects_parent_directory():
 
 def test_normalize_rejects_unknown_absolute_paths():
     """Test that unknown absolute paths are rejected."""
-    from actions_advisor.file_parser import _normalize_file_path
+    from actions_ai_advisor.file_parser import _normalize_file_path
 
     # Unknown CI paths should be rejected
     assert _normalize_file_path("/builds/project-123/src/main.go") is None

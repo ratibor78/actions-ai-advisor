@@ -16,4 +16,4 @@ COPY src/ ./src/
 RUN uv sync --frozen --no-dev || uv sync --no-dev
 
 # Run the action using virtual environment Python
-ENTRYPOINT ["/app/.venv/bin/python", "-m", "actions_advisor.main"]
+ENTRYPOINT ["/app/.venv/bin/python", "-m", "actions_ai_advisor.main"]

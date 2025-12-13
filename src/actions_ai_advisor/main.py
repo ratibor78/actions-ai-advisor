@@ -5,13 +5,13 @@ import sys
 
 from pydantic import ValidationError
 
-from actions_advisor.config import Config
-from actions_advisor.file_parser import parse_affected_files
-from actions_advisor.formatter import format_analysis, write_job_summary
-from actions_advisor.llm_client import LLMClient
-from actions_advisor.log_fetcher import LogFetcher
-from actions_advisor.preprocessor import preprocess_logs
-from actions_advisor.tokens import TokenCounter
+from actions_ai_advisor.config import Config
+from actions_ai_advisor.file_parser import parse_affected_files
+from actions_ai_advisor.formatter import format_analysis, write_job_summary
+from actions_ai_advisor.llm_client import LLMClient
+from actions_ai_advisor.log_fetcher import LogFetcher
+from actions_ai_advisor.preprocessor import preprocess_logs
+from actions_ai_advisor.tokens import TokenCounter
 
 
 async def analyze_failure() -> int:

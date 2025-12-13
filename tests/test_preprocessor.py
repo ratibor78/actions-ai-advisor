@@ -1,6 +1,6 @@
 """Tests for log preprocessor module."""
 
-from actions_advisor.preprocessor import (
+from actions_ai_advisor.preprocessor import (
     _collapse_repeated_lines,
     _remove_ansi_codes,
     _remove_excessive_empty_lines,

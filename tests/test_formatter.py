@@ -3,13 +3,13 @@
 import os
 import tempfile
 
-from actions_advisor.formatter import (
+from actions_ai_advisor.formatter import (
     _format_duration,
     format_analysis,
     write_job_summary,
 )
-from actions_advisor.llm_client import AnalysisResult
-from actions_advisor.log_fetcher import JobLog
+from actions_ai_advisor.llm_client import AnalysisResult
+from actions_ai_advisor.log_fetcher import JobLog
 
 
 def test_format_duration_seconds():

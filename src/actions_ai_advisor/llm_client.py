@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import httpx
 
-from actions_advisor.log_fetcher import JobLog
+from actions_ai_advisor.log_fetcher import JobLog
 
 # Provider API endpoints
 PROVIDER_ENDPOINTS: dict[str, str] = {

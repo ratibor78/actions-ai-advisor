@@ -2,9 +2,9 @@
 
 import os
 
-from actions_advisor.file_parser import AffectedFile, format_github_link
-from actions_advisor.llm_client import AnalysisResult
-from actions_advisor.log_fetcher import JobLog
+from actions_ai_advisor.file_parser import AffectedFile, format_github_link
+from actions_ai_advisor.llm_client import AnalysisResult
+from actions_ai_advisor.log_fetcher import JobLog
 
 
 def format_analysis(

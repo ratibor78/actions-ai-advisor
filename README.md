@@ -11,8 +11,8 @@
 
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Actions%20AI%20Advisor-blue?style=flat-square&logo=github)](https://github.com/marketplace/actions/actions-ai-advisor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI Status](https://img.shields.io/github/actions/workflow/status/ratibor78/actions-advisor/ci.yml?branch=main&label=tests&style=flat-square)](https://github.com/ratibor78/actions-advisor/actions)
-[![Latest Release](https://img.shields.io/github/v/release/ratibor78/actions-advisor?style=flat-square&color=orange)](https://github.com/ratibor78/actions-advisor/releases)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/ratibor78/actions-ai-advisor/ci.yml?branch=main&label=tests&style=flat-square)](https://github.com/ratibor78/actions-ai-advisor/actions)
+[![Latest Release](https://img.shields.io/github/v/release/ratibor78/actions-ai-advisor?style=flat-square&color=orange)](https://github.com/ratibor78/actions-ai-advisor/releases)
 
 <p align="center">
   <a href="#features">Key Features</a> •
@@ -97,7 +97,7 @@ jobs:
     permissions:
       actions: read
     steps:
-      - uses: ratibor78/actions-advisor@v1
+      - uses: ratibor78/actions-ai-advisor@v1
         with:
           github-token: ${{ github.token }}
           api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -143,7 +143,7 @@ jobs:
     permissions:
       actions: read
     steps:
-      - uses: ratibor78/actions-advisor@v1
+      - uses: ratibor78/actions-ai-advisor@v1
         with:
           github-token: ${{ github.token }}
           api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -164,7 +164,7 @@ jobs:
 ### Common Options
 
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     # Required
     github-token: ${{ github.token }}
@@ -180,7 +180,7 @@ jobs:
 
 **OpenAI (Recommended)**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -194,7 +194,7 @@ jobs:
 
 **Anthropic Claude**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -205,7 +205,7 @@ jobs:
 
 **OpenRouter**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENROUTER_API_KEY }}
@@ -216,7 +216,7 @@ jobs:
 
 **Self-Hosted**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.VLLM_API_KEY }}
@@ -288,7 +288,7 @@ Actions AI Advisor follows semantic versioning with recommended usage patterns:
 
 ### Recommended: Major Version (`@v1`)
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
 ```
 **Best for:** Most users who want automatic updates within v1.x.x
 - ✅ Gets latest features and bug fixes automatically
@@ -297,7 +297,7 @@ Actions AI Advisor follows semantic versioning with recommended usage patterns:
 
 ### Pinned: Exact Version (`@v1.0.0`)
 ```yaml
-- uses: ratibor78/actions-advisor@v1.0.0
+- uses: ratibor78/actions-ai-advisor@v1.0.0
 ```
 **Best for:** Enterprise/regulated environments requiring version pinning
 - ✅ Guaranteed reproducibility

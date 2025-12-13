@@ -3,7 +3,7 @@
 import httpx
 import pytest
 
-from actions_advisor.log_fetcher import LogFetcher
+from actions_ai_advisor.log_fetcher import LogFetcher
 
 
 @pytest.mark.asyncio

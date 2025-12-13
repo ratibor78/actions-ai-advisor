@@ -3,8 +3,8 @@
 import httpx
 import pytest
 
-from actions_advisor.llm_client import AnalysisResult, LLMClient
-from actions_advisor.log_fetcher import JobLog
+from actions_ai_advisor.llm_client import AnalysisResult, LLMClient
+from actions_ai_advisor.log_fetcher import JobLog
 
 
 @pytest.fixture
