@@ -334,8 +334,8 @@ Actions AI Advisor follows semantic versioning with recommended usage patterns:
 
 ```bash
 # Quick start
-git clone https://github.com/ratibor78/actions-advisor.git
-cd actions-advisor
+git clone https://github.com/ratibor78/actions-ai-advisor.git
+cd actions-ai-advisor
 pip install uv
 uv sync
 uv run pytest  # Run tests (all mocked, no API calls)
@@ -414,6 +414,6 @@ Special thanks to the open-source community for feedback and contributions!
 
 Made with ❤️ by [Oleksii Nizhegolenko](https://www.linkedin.com/in/nizhegolenko/)
 
-[Report Bug](https://github.com/ratibor78/actions-advisor/issues) • [Request Feature](https://github.com/ratibor78/actions-advisor/issues) • [Discussions](https://github.com/ratibor78/actions-advisor/discussions)
+[Report Bug](https://github.com/ratibor78/actions-ai-advisor/issues) • [Request Feature](https://github.com/ratibor78/actions-ai-advisor/issues) • [Discussions](https://github.com/ratibor78/actions-ai-advisor/discussions)
 
 </div>

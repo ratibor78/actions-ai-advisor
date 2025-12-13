@@ -36,7 +36,7 @@ class LogFetcher:
         self.headers = {
             "Authorization": f"Bearer {github_token}",
             "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "actions-advisor",
+            "User-Agent": "actions-ai-advisor",
         }
 
     async def fetch_failed_jobs(self) -> list[JobLog]:

@@ -29,8 +29,8 @@ This guide covers how to contribute to Actions AI Advisor, including setup, test
 **Using uv (recommended):**
 ```bash
 # Clone repository
-git clone https://github.com/ratibor78/actions-advisor.git
-cd actions-advisor
+git clone https://github.com/ratibor78/actions-ai-advisor.git
+cd actions-ai-advisor
 
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -47,8 +47,8 @@ uv run mypy --version
 **Using pip:**
 ```bash
 # Clone repository
-git clone https://github.com/ratibor78/actions-advisor.git
-cd actions-advisor
+git clone https://github.com/ratibor78/actions-ai-advisor.git
+cd actions-ai-advisor
 
 # Create virtual environment
 python -m venv .venv
@@ -72,10 +72,10 @@ mypy --version
 ### Project Structure
 
 ```
-actions-advisor/
+actions-ai-advisor/
 ├── .github/workflows/     # CI/CD pipelines
 ├── docs/                  # Documentation (you are here!)
-├── src/actions_advisor/   # Source code
+├── src/actions_ai_advisor/   # Source code
 ├── tests/                 # Test suite
 ├── action.yml             # GitHub Action definition
 ├── Dockerfile             # Docker container
@@ -92,7 +92,7 @@ uv run pytest
 
 **With coverage:**
 ```bash
-uv run pytest --cov=src/actions_advisor --cov-report=term-missing
+uv run pytest --cov=src/actions_ai_advisor --cov-report=term-missing
 ```
 
 **Specific test file:**
@@ -163,7 +163,7 @@ export GITHUB_STEP_SUMMARY="output.md"    # Local file for summary
 #### 3. Run Locally
 
 ```bash
-uv run actions-advisor
+uv run actions-ai-advisor
 ```
 
 **⚠️ Warning:** This makes **real API calls** and costs money (~$0.0003-0.0008 per run).
@@ -198,7 +198,7 @@ tests/
 
 ```python
 import pytest
-from actions_advisor.file_parser import extract_affected_files, AffectedFile
+from actions_ai_advisor.file_parser import extract_affected_files, AffectedFile
 
 def test_python_traceback_extraction():
     """Test extracting file paths from Python tracebacks."""
@@ -222,7 +222,7 @@ def test_python_traceback_extraction():
 
 ```python
 import pytest
-from actions_advisor.llm_client import LLMClient
+from actions_ai_advisor.llm_client import LLMClient
 
 @pytest.mark.asyncio
 async def test_llm_client_analyze(mock_llm_response):
@@ -243,7 +243,7 @@ async def test_llm_client_analyze(mock_llm_response):
 
 ```bash
 # Build local image
-docker build -t actions-advisor:test .
+docker build -t actions-ai-advisor:test .
 
 # Run with environment variables
 docker run --rm \
@@ -254,7 +254,7 @@ docker run --rm \
   -e GITHUB_REPOSITORY="owner/repo" \
   -e GITHUB_RUN_ID="12345678" \
   -e GITHUB_SHA="abc123" \
-  actions-advisor:test
+  actions-ai-advisor:test
 ```
 
 ### Coverage Requirements
@@ -386,7 +386,7 @@ test: Add coverage for Rust Cargo workspace detection
 See [Language Support Documentation](language-support.md#adding-new-languages) for detailed instructions.
 
 **Quick steps:**
-1. Add regex pattern to `src/actions_advisor/file_parser.py`
+1. Add regex pattern to `src/actions_ai_advisor/file_parser.py`
 2. Add to `LANGUAGE_PATTERNS` list
 3. Create test fixture in `tests/fixtures/sample_logs/`
 4. Add test case to `tests/test_file_parser.py`
@@ -435,11 +435,11 @@ uv run ruff check .
 uv run mypy src/
 
 # Docker must build
-docker build -t actions-advisor:v1.0.0 .
+docker build -t actions-ai-advisor:v1.0.0 .
 
 # Test with real workflow
 export GITHUB_TOKEN="..." && export INPUT_API_KEY="..." && ...
-uv run actions-advisor
+uv run actions-ai-advisor
 ```
 
 #### 3. Commit and Tag
@@ -459,15 +459,15 @@ git push origin v1.0.0
 
 Pushing the tag triggers `.github/workflows/release.yml`:
 - Builds Docker image
-- Pushes to GitHub Container Registry (`ghcr.io/ratibor78/actions-advisor:v1.0.0`)
+- Pushes to GitHub Container Registry (`ghcr.io/ratibor78/actions-ai-advisor:v1.0.0`)
 - Updates `latest` tag
 - Creates GitHub Release with auto-generated notes
 
 #### 5. Verify Release
 
-1. Check workflow succeeded: https://github.com/ratibor78/actions-advisor/actions
-2. Verify Docker image: `docker pull ghcr.io/ratibor78/actions-advisor:v1.0.0`
-3. Check GitHub Releases: https://github.com/ratibor78/actions-advisor/releases
+1. Check workflow succeeded: https://github.com/ratibor78/actions-ai-advisor/actions
+2. Verify Docker image: `docker pull ghcr.io/ratibor78/actions-ai-advisor:v1.0.0`
+3. Check GitHub Releases: https://github.com/ratibor78/actions-ai-advisor/releases
 
 ### Updating an Existing Tag (Not Recommended)
 
@@ -524,7 +524,7 @@ print(f"Matches: {pattern.findall(logs)}")
 **Enable verbose output:**
 ```bash
 export ACTIONS_STEP_DEBUG=true
-uv run actions-advisor
+uv run actions-ai-advisor
 ```
 
 **View GitHub Actions logs:**
@@ -573,7 +573,7 @@ A: Python 3.12+ is required. The project uses modern type hints and features.
 A: Edit `pyproject.toml`, then run `uv sync` to update `uv.lock`.
 
 **Q: Where can I ask questions?**
-A: Open an issue or discussion on GitHub: https://github.com/ratibor78/actions-advisor/issues
+A: Open an issue or discussion on GitHub: https://github.com/ratibor78/actions-ai-advisor/issues
 
 ---
 

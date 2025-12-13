@@ -265,7 +265,7 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 
 **Configuration:**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -293,7 +293,7 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 
 **Configuration:**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -325,7 +325,7 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 
 **Configuration:**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.OPENROUTER_API_KEY }}
@@ -339,8 +339,8 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```python
 {
     "Authorization": f"Bearer {api_key}",
-    "HTTP-Referer": "https://github.com/actions-advisor",  # Required by OpenRouter
-    "X-Title": "Actions Advisor",  # Optional but recommended
+    "HTTP-Referer": "https://github.com/actions-ai-advisor",  # Required by OpenRouter
+    "X-Title": "Actions AI Advisor",  # Optional but recommended
     "Content-Type": "application/json"
 }
 ```
@@ -360,7 +360,7 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 
 **Configuration:**
 ```yaml
-- uses: ratibor78/actions-advisor@v1
+- uses: ratibor78/actions-ai-advisor@v1
   with:
     github-token: ${{ github.token }}
     api-key: ${{ secrets.VLLM_API_KEY }}  # Can be anything for local

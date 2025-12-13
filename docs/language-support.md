@@ -399,7 +399,7 @@ To add support for a new language:
 
 ### 1. Add Regex Pattern
 
-Edit `src/actions_advisor/file_parser.py`:
+Edit `src/actions_ai_advisor/file_parser.py`:
 
 **Option A: Use PATH_PATTERN for cross-platform support (recommended)**
 ```python

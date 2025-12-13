@@ -214,7 +214,7 @@ Welcome to the comprehensive documentation for Actions AI Advisor, a GitHub Acti
 ## 🏗️ Project Structure
 
 ```
-actions-advisor/
+actions-ai-advisor/
 ├── .github/workflows/        # CI/CD pipelines
 │   ├── ci.yml                # Lint, test, build
 │   ├── release.yml           # Release automation
@@ -228,7 +228,7 @@ actions-advisor/
 │   ├── llm-integration.md    # Prompt engineering
 │   └── development.md        # Contributing guide
 │
-├── src/actions_advisor/      # Source code (8 modules)
+├── src/actions_ai_advisor/      # Source code (8 modules)
 │   ├── __init__.py
 │   ├── main.py               # Orchestration
 │   ├── config.py             # Configuration
@@ -289,10 +289,10 @@ When working on this codebase, AI agents should:
 ## 🔗 External Resources
 
 ### Official Links
-- **GitHub Repository:** https://github.com/ratibor78/actions-advisor
-- **Issues:** https://github.com/ratibor78/actions-advisor/issues
-- **Discussions:** https://github.com/ratibor78/actions-advisor/discussions
-- **Releases:** https://github.com/ratibor78/actions-advisor/releases
+- **GitHub Repository:** https://github.com/ratibor78/actions-ai-advisor
+- **Issues:** https://github.com/ratibor78/actions-ai-advisor/issues
+- **Discussions:** https://github.com/ratibor78/actions-ai-advisor/discussions
+- **Releases:** https://github.com/ratibor78/actions-ai-advisor/releases
 
 ### Related Projects
 - **uv (package manager):** https://github.com/astral-sh/uv
@@ -332,10 +332,10 @@ See [Development Guide](development.md#contributing) for contribution process.
 
 ## 📧 Questions or Feedback?
 
-- **General questions:** Open a [Discussion](https://github.com/ratibor78/actions-advisor/discussions)
-- **Bug reports:** Open an [Issue](https://github.com/ratibor78/actions-advisor/issues)
-- **Feature requests:** Open an [Issue](https://github.com/ratibor78/actions-advisor/issues) with `[Feature Request]` prefix
-- **Documentation issues:** Open an [Issue](https://github.com/ratibor78/actions-advisor/issues) with `[Docs]` prefix
+- **General questions:** Open a [Discussion](https://github.com/ratibor78/actions-ai-advisor/discussions)
+- **Bug reports:** Open an [Issue](https://github.com/ratibor78/actions-ai-advisor/issues)
+- **Feature requests:** Open an [Issue](https://github.com/ratibor78/actions-ai-advisor/issues) with `[Feature Request]` prefix
+- **Documentation issues:** Open an [Issue](https://github.com/ratibor78/actions-ai-advisor/issues) with `[Docs]` prefix
 
 ---
 

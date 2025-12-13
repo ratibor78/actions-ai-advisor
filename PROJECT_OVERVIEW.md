@@ -378,7 +378,7 @@ MIT License - See LICENSE file
 
 - **Repository:** https://github.com/ratibor78/actions-ai-advisor
 - **Docker Image:** ghcr.io/ratibor78/actions-ai-advisor
-- **Issues:** https://github.com/ratibor78/actions-advisor/issues (old link, needs updating)
+- **Issues:** https://github.com/ratibor78/actions-ai-advisor/issues
 - **Marketplace:** (not yet published)
 
 ---

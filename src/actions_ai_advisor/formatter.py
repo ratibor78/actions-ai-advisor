@@ -84,7 +84,7 @@ def format_analysis(
 
 {token_info}
 
-<sub>Powered by Actions AI Advisor | [Report Issues](https://github.com/ratibor78/actions-advisor/issues)</sub>
+<sub>Powered by Actions AI Advisor | [Report Issues](https://github.com/ratibor78/actions-ai-advisor/issues)</sub>
 """
 
     return markdown

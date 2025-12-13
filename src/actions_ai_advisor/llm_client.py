@@ -145,8 +145,8 @@ class LLMClient:
         elif self.provider == "openrouter":
             return {
                 "Authorization": f"Bearer {self.api_key}",
-                "HTTP-Referer": "https://github.com/actions-advisor",
-                "X-Title": "Actions Advisor",
+                "HTTP-Referer": "https://github.com/actions-ai-advisor",
+                "X-Title": "Actions AI Advisor",
                 "Content-Type": "application/json",
             }
         else:

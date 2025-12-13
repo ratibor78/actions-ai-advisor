@@ -156,5 +156,5 @@ def test_build_headers_openrouter():
     headers = client._build_headers()
 
     assert headers["Authorization"] == "Bearer test-key"
-    assert headers["HTTP-Referer"] == "https://github.com/actions-advisor"
-    assert headers["X-Title"] == "Actions Advisor"
+    assert headers["HTTP-Referer"] == "https://github.com/actions-ai-advisor"
+    assert headers["X-Title"] == "Actions AI Advisor"
