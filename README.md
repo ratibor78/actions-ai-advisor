@@ -99,8 +99,8 @@ jobs:
     steps:
       - uses: ratibor78/actions-ai-advisor@v1
         with:
-          github-token: ${{ github.token }}
-          api-key: ${{ secrets.OPENAI_API_KEY }}
+          github_token: ${{ github.token }}
+          api_key: ${{ secrets.OPENAI_API_KEY }}
           provider: openai
           model: gpt-4o-mini
 ```
@@ -145,8 +145,8 @@ jobs:
     steps:
       - uses: ratibor78/actions-ai-advisor@v1
         with:
-          github-token: ${{ github.token }}
-          api-key: ${{ secrets.OPENAI_API_KEY }}
+          github_token: ${{ github.token }}
+          api_key: ${{ secrets.OPENAI_API_KEY }}
           provider: openai
           model: gpt-4o-mini
 ```
@@ -167,13 +167,13 @@ jobs:
 - uses: ratibor78/actions-ai-advisor@v1
   with:
     # Required
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.OPENAI_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.OPENAI_API_KEY }}
 
     # Optional
     provider: openai              # openai, anthropic, openrouter, selfhosted
     model: gpt-4o-mini            # Provider-specific model name
-    base-url: ""                  # Custom API URL (self-hosted only)
+    base_url: ""                  # Custom API URL (self-hosted only)
 ```
 
 ### LLM Providers
@@ -182,8 +182,8 @@ jobs:
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.OPENAI_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.OPENAI_API_KEY }}
     provider: openai
     model: gpt-4o-mini  # or gpt-4o
 ```
@@ -196,8 +196,8 @@ jobs:
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     provider: anthropic
     model: claude-3-5-haiku-latest
 ```
@@ -207,8 +207,8 @@ jobs:
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.OPENROUTER_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.OPENROUTER_API_KEY }}
     provider: openrouter
     model: openai/gpt-4o-mini
 ```
@@ -218,10 +218,10 @@ jobs:
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.VLLM_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.VLLM_API_KEY }}
     provider: selfhosted
-    base-url: https://llm.internal.company.com/v1
+    base_url: https://llm.internal.company.com/v1
     model: Qwen/Qwen2.5-Coder-32B-Instruct
 ```
 **Requirements:** OpenAI-compatible API • 7B+ parameter models recommended
