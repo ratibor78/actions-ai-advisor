@@ -31,4 +31,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://ghcr.io/ratibor78/actions-ai-advisor:v1'
