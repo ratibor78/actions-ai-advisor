@@ -7,11 +7,11 @@ branding:
   color: 'orange'
 
 inputs:
-  github-token:
+  github_token:
     description: 'GitHub token for API access'
     required: true
 
-  api-key:
+  api_key:
     description: 'API key for the LLM provider'
     required: true
 
@@ -25,7 +25,7 @@ inputs:
     required: false
     default: 'gpt-4o-mini'
 
-  base-url:
+  base_url:
     description: 'Custom API URL (only for selfhosted provider)'
     required: false
 
