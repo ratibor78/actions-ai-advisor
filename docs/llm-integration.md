@@ -267,8 +267,8 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.OPENAI_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.OPENAI_API_KEY }}
     provider: openai
     model: gpt-4o-mini
 ```
@@ -295,8 +295,8 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     provider: anthropic
     model: claude-3-5-haiku-latest
 ```
@@ -327,8 +327,8 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.OPENROUTER_API_KEY }}
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.OPENROUTER_API_KEY }}
     provider: openrouter
     model: openai/gpt-4o-mini  # Note: provider/model format
 ```
@@ -362,11 +362,11 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```yaml
 - uses: ratibor78/actions-ai-advisor@v1
   with:
-    github-token: ${{ github.token }}
-    api-key: ${{ secrets.VLLM_API_KEY }}  # Can be anything for local
+    github_token: ${{ github.token }}
+    api_key: ${{ secrets.VLLM_API_KEY }}  # Can be anything for local
     provider: selfhosted
     model: meta-llama/Llama-3.1-8B-Instruct
-    base-url: https://your-vllm-instance.com/v1
+    base_url: https://your-vllm-instance.com/v1
 ```
 
 **Requirements:**
@@ -378,7 +378,7 @@ The LLM naturally produces more detailed output for complex scenarios based on t
 ```yaml
     provider: selfhosted
     model: llama3.1
-    base-url: http://localhost:11434/v1
+    base_url: http://localhost:11434/v1
 ```
 
 **Cost:** Free (self-hosted), but requires GPU infrastructure
